@@ -1,0 +1,14 @@
+# Frontend (Next.js) specific ignores
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Backend (Spring Boot) specific ignores
+backend/wealth-one/target/
+backend/wealth-one/.idea/
+backend/wealth-one/*.iml
+
+# General ignores
+.DS_Store
+.env
+*.log
