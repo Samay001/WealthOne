@@ -83,12 +83,10 @@ export default function Footer() {
 
       {/* Main content - takes up 50% of viewport */}
       <main className="relative z-10 h-[50vh] flex items-center justify-center px-4">
-        <h1 className="text-white text-7xl md:text-9xl lg:text-[10rem] xl:text-[12rem] font-bold tracking-tighter leading-none">
+        <h1 className="text-white text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] 2xl:text-[12rem] font-bold tracking-tighter leading-none">
           Wealth One
         </h1>
       </main>
-
-      
 
       {/* Scroll to top button (fixed) */}
       {scrolled && (
