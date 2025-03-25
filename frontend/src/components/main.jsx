@@ -1,4 +1,5 @@
 import React from "react";
+import HoverBorderGradientDemo from "@/components/hover-border";
 
 const Main = () => {
   return (
@@ -19,11 +20,29 @@ const Main = () => {
         alt=""
         className="block w-full h-full rounded-inherit object-cover object-center"
       />
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white max-w-4xl w-4/5 p-6"
-      >
-        <h1 className="text-4xl font-bold mb-4">Main Text</h1>
-        <p className="text-lg">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quam velit laborum doloremque repellat, modi optio perspiciatis quis nemo minus iure esse unde exercitationem nulla illo necessitatibus dolore! Eveniet, et officiis!</p>
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/3 w-60 h-60 md:w-80 md:h-80 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-20 blur-3xl z-10"></div>
+
+      <div className="absolute top-[40%] sm:top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white max-w-4xl w-4/5 p-6 mt-4">
+        <div className="mb-6 mt-8 flex items-center justify-center space-x-2">
+          <span className="h-px w-10 bg-blue-500/70"></span>
+          <p className="text-sm font-light tracking-wide text-blue-300 sm:text-base">
+            The best investment you can make is in understanding your
+            investments.
+          </p>
+          <span className="h-px w-10 bg-blue-500/70"></span>
+        </div>
+        <h1 className="mb-4 max-w-4xl text-4xl font-bold leading-tight sm:text-4xl md:text-5xl lg:text-6xl">
+          AI Agents That
+          <br />
+          Helps You <span className="text-blue-400">Understand</span>,<br />
+          And <span className="text-blue-400">Optimised</span> .
+        </h1>
+        <p className="mb-6 text-sm font-light tracking-wide text-gray-300 sm:text-base">
+          Manage all your portfolio at same place.
+        </p>
+        <div className="flex justify-center">
+          <HoverBorderGradientDemo />
+        </div>
       </div>
     </div>
   );
