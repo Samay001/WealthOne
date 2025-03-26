@@ -1,0 +1,38 @@
+{
+  "user_id": "CDX_12345",
+  "username": "john_doe_crypto",
+  "email": "john@example.com",
+  "total_investment": 250000.0,
+  "total_profit": 75000.0,
+  "total_loss": 15000.0,
+  "current_portfolio_value": 310000.0,
+  "wallet_balance": {
+    "INR": 50000.0,
+    "BTC": 0.5,
+    "ETH": 4.2,
+    "USDT": 100.0
+  },
+  "order_history": [
+    {
+      "order_id": "CDX_ORDER_001",
+      "coin": "BTC",
+      "type": "BUY",
+      "quantity": 0.3,
+      "price_per_unit": 2800000.0,
+      "timestamp": "2023-05-15T10:30:00Z",
+      "status": "COMPLETED",
+      "fees": 150.0
+    },
+    {
+      "order_id": "CDX_ORDER_002",
+      "coin": "ETH",
+      "type": "SELL",
+      "quantity": 2.0,
+      "price_per_unit": 180000.0,
+      "timestamp": "2023-08-20T14:45:00Z",
+      "status": "COMPLETED",
+      "fees": 75.0
+    }
+  ],
+  "last_updated": "2023-10-25T09:15:00Z"
+}

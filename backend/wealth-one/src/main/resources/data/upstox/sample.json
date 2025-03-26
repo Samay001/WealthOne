@@ -1,0 +1,57 @@
+{
+  "user_id": "UPX_67890",
+  "username": "john_doe_stocks",
+  "email": "john@example.com",
+  "total_investment": 500000.0,
+  "total_profit": 120000.0,
+  "total_loss": 30000.0,
+  "current_portfolio_value": 590000.0,
+  "holdings": [
+    {
+      "stock_symbol": "RELIANCE",
+      "quantity": 50,
+      "average_price": 2500.0,
+      "current_price": 2700.0,
+      "sector": "Energy"
+    },
+    {
+      "stock_symbol": "TCS",
+      "quantity": 100,
+      "average_price": 3200.0,
+      "current_price": 3500.0,
+      "sector": "IT"
+    }
+  ],
+  "order_history": [
+    {
+      "order_id": "UPX_ORDER_101",
+      "stock_symbol": "RELIANCE",
+      "exchange": "NSE",
+      "type": "BUY",
+      "quantity": 50,
+      "price_per_unit": 2500.0,
+      "timestamp": "2023-04-10T11:00:00Z",
+      "status": "EXECUTED",
+      "brokerage": 50.0
+    },
+    {
+      "order_id": "UPX_ORDER_102",
+      "stock_symbol": "TCS",
+      "exchange": "BSE",
+      "type": "SELL",
+      "quantity": 30,
+      "price_per_unit": 3400.0,
+      "timestamp": "2023-09-05T15:30:00Z",
+      "status": "EXECUTED",
+      "brokerage": 30.0
+    }
+  ],
+  "dividends_received": [
+    {
+      "stock_symbol": "RELIANCE",
+      "amount": 5000.0,
+      "timestamp": "2023-07-01T00:00:00Z"
+    }
+  ],
+  "last_updated": "2023-10-25T09:15:00Z"
+}

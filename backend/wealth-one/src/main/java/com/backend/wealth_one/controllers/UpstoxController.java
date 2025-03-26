@@ -67,4 +67,17 @@ public class UpstoxController {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/orders-history")
+    public ResponseEntity<?> getOrdersHistory(){
+        try{
+            Map<String,Object> orderHistory = upstoxAuthService.makeRequest(HttpMethod.GET, "/order/history", null);
+            return ResponseEntity.ok(orderHistory);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+
+        }
+    }
+
 }
