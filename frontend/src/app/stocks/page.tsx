@@ -1,18 +1,21 @@
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MetricsCard } from "@/components/metrics-card";
-import {PieComponent} from '@/components/pie-chart'
-import { LineComponent } from "@/components/line-chart";
+import { StatsChart } from "@/components/stats-chart";
+import { VaultTable } from "@/components/vault-table";
 import {
   BarChart3,
   ChevronDown,
   Globe,
   Home,
   LayoutDashboard,
+  LifeBuoy,
+  Settings,
   Wallet,
 } from "lucide-react";
 
-export default function Dashboard() {
+export default function StockDashboard() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="grid lg:grid-cols-[280px_1fr]">
@@ -103,10 +106,33 @@ export default function Dashboard() {
               }}
             />
           </div>
-          <div className="chart-theme flex mt-10 gap-17">
-            <PieComponent/>
-            <LineComponent/>
-            <LineComponent/>
+          <Card className="mt-6 p-6 bg-[#09090B] border-white/20">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">
+                General Statistics
+              </h2>
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" className="text-white">
+                  Today
+                </Button>
+                <Button size="sm" variant="ghost" className="text-white">
+                  Last week
+                </Button>
+                <Button size="sm" variant="ghost" className="text-white">
+                  Last month
+                </Button>
+                <Button size="sm" variant="ghost" className="text-white">
+                  Last 6 months
+                </Button>
+                <Button size="sm" variant="ghost" className="text-white">
+                  Year
+                </Button>
+              </div>
+            </div>
+            <StatsChart />
+          </Card>
+          <div className="mt-6">
+            <VaultTable />
           </div>
         </main>
       </div>
