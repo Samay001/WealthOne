@@ -1,6 +1,5 @@
 import { Avatar } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal } from "lucide-react"
 
 const vaults = [
   {
@@ -42,24 +41,24 @@ export function VaultTable() {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>Vault</TableHead>
-          <TableHead>Daily</TableHead>
-          <TableHead>Balance ↓</TableHead>
-          <TableHead>APY ↓</TableHead>
-          <TableHead>State</TableHead>
-          <TableHead>Start date</TableHead>
-          <TableHead>Liquidity</TableHead>
+        <TableRow className="hover:bg-black border-white/30">
+          <TableHead className="text-gray-400 font-bold">Vault</TableHead>
+          <TableHead className="text-gray-400 font-bold">Daily</TableHead>
+          <TableHead className="text-gray-400 font-bold">Balance ↓</TableHead>
+          <TableHead className="text-gray-400 font-bold">APY ↓</TableHead>
+          <TableHead className="text-gray-400 font-bold">State</TableHead>
+          <TableHead className="text-gray-400 font-bold">Start date</TableHead>
+          <TableHead className="text-gray-400 font-bold">Liquidity</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {vaults.map((vault) => (
-          <TableRow key={vault.symbol}>
-            <TableCell className="font-medium">
+          <TableRow key={vault.symbol} className="hover:bg-[#131316] border-white/20" >
+            <TableCell className="font-medium ">
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
-                  <img src={`/placeholder.svg?height=24&width=24`} alt={vault.name} />
+                  <img src={"https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=003"} alt={vault.name} />
                 </Avatar>
                 <div>
                   <div className="font-medium">{vault.name}</div>
@@ -94,9 +93,7 @@ export function VaultTable() {
                 ))}
               </div>
             </TableCell>
-            <TableCell>
-              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-            </TableCell>
+    
           </TableRow>
         ))}
       </TableBody>
