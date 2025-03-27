@@ -1,0 +1,78 @@
+{
+    "user_id": "STOCK_456",
+    "username": "john_doe_stocks",
+    "total_stock_investment": 750000,
+    "current_stock_value": 925000,
+    "total_profit_loss": 175000,
+    "total_percentage_change": 23.33,
+    "holdings": [
+      {
+        "id": "RELIANCE-001",
+        "symbol": "RELIANCE",
+        "name": "Reliance Industries",
+        "icon": "https://companieslogo.com/img/orig/RELIANCE.NS-128a8626.png",
+        "sector": "Energy",
+        "exchange": "NSE",
+        "total_shares": 50,
+        "purchase_history": [
+          {
+            "date": "2023-02-15",
+            "quantity": 30,
+            "buy_price": 2400,
+            "brokerage": 50
+          },
+          {
+            "date": "2023-07-01",
+            "quantity": 20,
+            "buy_price": 2600,
+            "brokerage": 40
+          }
+        ],
+        "total_investment": 244000,
+        "current_price": 2700,
+        "current_value": 135000,
+        "profit_loss": 11000,
+        "percentage_change": 8.87,
+        "dividends": [
+          {
+            "date": "2023-07-15",
+            "amount": 5000
+          }
+        ]
+      },
+      {
+        "id": "TCS-002",
+        "symbol": "TCS",
+        "name": "Tata Consultancy Services",
+        "icon": "https://companieslogo.com/img/orig/TCS.NS-74035a92.png",
+        "sector": "IT",
+        "exchange": "BSE",
+        "total_shares": 100,
+        "purchase_history": [
+          {
+            "date": "2023-01-10",
+            "quantity": 70,
+            "buy_price": 3200,
+            "brokerage": 70
+          },
+          {
+            "date": "2023-05-20",
+            "quantity": 30,
+            "buy_price": 3400,
+            "brokerage": 30
+          }
+        ],
+        "total_investment": 506000,
+        "current_price": 3500,
+        "current_value": 350000,
+        "profit_loss": 144000,
+        "percentage_change": 41.11,
+        "dividends": [
+          {
+            "date": "2023-04-01",
+            "amount": 7500
+          }
+        ]
+      }
+    ]
+  }
