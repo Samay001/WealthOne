@@ -17,6 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
   { month: "February", desktop: 305, mobile: 200 },
@@ -39,54 +40,65 @@ const chartConfig = {
 
 export function LineComponent() {
   return (
-    <Card className="flex flex-col border-white/20 h-120 w-120">
-      <CardHeader>
-        <CardTitle>Line Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+    <Card className="flex flex-col border-white/20 h-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm sm:text-base">Line Chart - Multiple</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">January - June 2024</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
-              dataKey="desktop"
-              type="monotone"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="mobile"
-              type="monotone"
-              stroke="var(--color-mobile)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
+      <CardContent className="flex-1 pb-0">
+        <div className="w-full h-full min-h-[200px] sm:min-h-[250px]">
+          <ChartContainer config={chartConfig} className="h-full w-full">
+            <LineChart 
+              data={chartData}
+              margin={{
+                left: 8,
+                right: 8,
+                top: 8,
+                bottom: 8,
+              }}
+            >
+              <CartesianGrid 
+                vertical={false} 
+                stroke="var(--border)"
+                strokeDasharray="3 3"
+              />
+              <XAxis 
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+                fontSize={12}
+              />
+              <ChartTooltip 
+                cursor={false} 
+                content={<ChartTooltipContent />} 
+              />
+              <Line
+                dataKey="desktop"
+                type="monotone"
+                stroke="var(--color-desktop)"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                dataKey="mobile"
+                type="monotone"
+                stroke="var(--color-mobile)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ChartContainer>
+        </div>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+      <CardFooter className="pt-2">
+        <div className="flex w-full items-start gap-1 sm:gap-2 text-xs sm:text-sm">
+          <div className="grid gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 font-medium leading-none">
+              Trending up by 5.2% this month <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
             </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+            <div className="leading-none text-muted-foreground">
               Showing total visitors for the last 6 months
             </div>
           </div>
