@@ -19,21 +19,34 @@ const Navbar = () => {
           </div>
 
           {/* Hide Nav Items When Menu is Open */}
-          <ul className={`md:flex items-center space-x-6 ${isMenuOpen ? "flex" : "hidden"}`}>
+          <ul
+            className={`md:flex items-center space-x-6 ${
+              isMenuOpen ? "flex" : "hidden"
+            }`}
+          >
             <li>
-              <Link href="/about" className="text-white hover:text-gray-300 transition">
+              <Link
+                href="#"
+                className="text-white hover:text-gray-300 transition"
+              >
                 About
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="text-white hover:text-gray-300 transition">
+              <Link
+                href="#"
+                className="text-white hover:text-gray-300 transition"
+              >
                 Contact
               </Link>
             </li>
             <li>
-              <button className="bg-blue-500 text-gray-200 px-5 py-1.5 rounded-md hover:bg-blue-600 transition duration-300">
+              <Link
+                href="/login"
+                className="bg-blue-500 text-gray-200 px-5 py-1.5 rounded-md hover:bg-blue-600 transition duration-300"
+              >
                 Login
-              </button>
+              </Link>
             </li>
           </ul>
 

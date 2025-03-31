@@ -1,5 +1,6 @@
 import React from "react";
 import HoverBorderGradientDemo from "@/components/hover-border";
+import Link from "next/link";
 
 const Main = () => {
   return (
@@ -41,7 +42,9 @@ const Main = () => {
           Manage all your portfolio at same place.
         </p>
         <div className="flex justify-center">
-          <HoverBorderGradientDemo />
+          <Link href="/register">
+            <HoverBorderGradientDemo />
+          </Link>
         </div>
       </div>
     </div>

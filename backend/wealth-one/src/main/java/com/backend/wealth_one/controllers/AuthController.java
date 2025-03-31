@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth/v1")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
@@ -23,8 +24,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user){
-        if(authService.getUserByUsername(user.getUsername()).isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+        if(authService.getUserByEmail(user.getEmail()).isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
         }
         return ResponseEntity.ok(authService.registerUser(user));
     }
@@ -35,6 +36,7 @@ public class AuthController {
         String password = credentials.getOrDefault("password", "");
 
         Optional<User> user = authService.getUserByUsername(username);
+        System.out.println(user);
 
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
             return ResponseEntity.ok("Login successful");
@@ -45,7 +47,7 @@ public class AuthController {
 
     @GetMapping("/user/{username}")
     public ResponseEntity<?> userDetails(@PathVariable String username) {
-        Optional<User> existingUser = authService.getUserByUsername(username);
+        Optional<User> existingUser = authService.getUserByEmail(username);
         if (existingUser.isPresent()) {
             return ResponseEntity.ok(existingUser.get());
         }

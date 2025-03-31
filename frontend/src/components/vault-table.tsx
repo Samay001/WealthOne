@@ -9,7 +9,7 @@ const vaults = [
     daily: "+$213.8",
     balance: "$13,954.04",
     apy: "8.56%",
-    state: "Fixed",
+    state: "SPOT",
     startDate: "05.10.2023",
     liquidity: "high",
   },
@@ -20,7 +20,7 @@ const vaults = [
     daily: "+$45.1",
     balance: "$3,954.04",
     apy: "5.44%",
-    state: "Fixed",
+    state: "SPOT",
     startDate: "12.03.2023",
     liquidity: "medium",
   },
@@ -31,7 +31,7 @@ const vaults = [
     daily: "+$13.5",
     balance: "$3,954.04",
     apy: "4.12%",
-    state: "Flexible",
+    state: "SPOT",
     startDate: "21.01.2023",
     liquidity: "low",
   },
@@ -42,13 +42,15 @@ export function VaultTable() {
     <Table>
       <TableHeader>
         <TableRow className="hover:bg-black border-white/30">
-          <TableHead className="text-gray-400 font-bold">Vault</TableHead>
-          <TableHead className="text-gray-400 font-bold">Daily</TableHead>
-          <TableHead className="text-gray-400 font-bold">Balance ↓</TableHead>
-          <TableHead className="text-gray-400 font-bold">APY ↓</TableHead>
-          <TableHead className="text-gray-400 font-bold">State</TableHead>
+          <TableHead className="text-gray-400 font-bold">Coins</TableHead>
+          <TableHead className="text-gray-400 font-bold">Position</TableHead>
+          <TableHead className="text-gray-400 font-bold">Price</TableHead>
+          <TableHead className="text-gray-400 font-bold">Investment</TableHead>
+          <TableHead className="text-gray-400 font-bold">%Change</TableHead>
+          <TableHead className="text-gray-400 font-bold">Balance</TableHead>
+          <TableHead className="text-gray-400 font-bold">Market Cap</TableHead>
           <TableHead className="text-gray-400 font-bold">Start date</TableHead>
-          <TableHead className="text-gray-400 font-bold">Liquidity</TableHead>
+          {/* <TableHead className="text-gray-400 font-bold">Liquidity</TableHead> */}
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
@@ -66,33 +68,23 @@ export function VaultTable() {
                 </div>
               </div>
             </TableCell>
-            <TableCell className="text-green-500">{vault.daily}</TableCell>
-            <TableCell>{vault.balance}</TableCell>
-            <TableCell>{vault.apy}</TableCell>
+            
             <TableCell>
               <span
                 className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                  vault.state === "Fixed" ? "bg-yellow-500/10 text-yellow-500" : "bg-green-500/10 text-green-500"
+                  vault.state === "SPOT" ? "bg-yellow-500/10 text-yellow-500" : "bg-green-500/10 text-green-500"
                 }`}
               >
                 {vault.state}
               </span>
             </TableCell>
+            <TableCell>{vault.balance}</TableCell>
+            <TableCell>{vault.balance}</TableCell>
+            <TableCell className="text-green-500">{vault.daily}</TableCell>
+            <TableCell>{vault.balance}</TableCell>
+            <TableCell>{vault.balance}</TableCell>
+            
             <TableCell>{vault.startDate}</TableCell>
-            <TableCell>
-              <div className="flex gap-1">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 w-3 rounded-full ${
-                      i < (vault.liquidity === "high" ? 3 : vault.liquidity === "medium" ? 2 : 1)
-                        ? "bg-primary"
-                        : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-            </TableCell>
     
           </TableRow>
         ))}

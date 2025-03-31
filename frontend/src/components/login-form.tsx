@@ -1,7 +1,11 @@
+"use client"
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from 'axios';
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   type, // "login" or "register"
@@ -12,8 +16,39 @@ export function LoginForm({
 } & React.ComponentProps<"form">) {
   const isLogin = type === "login";
 
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Fixed: added parentheses to call the function
+
+    try {
+      const url = isLogin ? "http://localhost:8080/auth/v1/login" : "http://localhost:8080/auth/v1/register";
+      const data = isLogin ? { username, password } : { username, email, password };
+      console.log(data);
+      const res = await axios.post(url, data, { withCredentials: true });
+
+      if (res.status === 200) {
+        if(isLogin){
+          alert("Login Successful");
+          router.push("/credential")
+        }
+        else{
+          alert("Register Successful");
+          router.push("/login");
+        }   
+      }
+    }
+    catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong");
+    }
+  }
+  
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">
           {isLogin ? "Login to your account" : "Create an account"}
@@ -25,16 +60,31 @@ export function LoginForm({
         </p>
       </div>
       <div className="grid gap-6">
+        {/* Fixed: Add username field for login too */}
+        <div className="grid gap-3">
+          <Label htmlFor="username">Username</Label>
+          <Input 
+            id="username" 
+            type="text" 
+            placeholder="johndoe" 
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
         {!isLogin && (
           <div className="grid gap-3">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" type="text" placeholder="John Doe" required />
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="m@example.com" 
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
         )}
-        <div className="grid gap-3">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
-        </div>
         <div className="grid gap-3">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
@@ -44,7 +94,13 @@ export function LoginForm({
               </a>
             )}
           </div>
-          <Input id="password" type="password" required />
+          <Input 
+            id="password" 
+            type="password" 
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
         <Button type="submit" className="w-full">
           {isLogin ? "Login" : "Sign Up"}

@@ -43,7 +43,7 @@ export function StatsChart() {
               return null
             }}
           />
-          <Line type="monotone" dataKey="value" stroke="#ff6b00" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

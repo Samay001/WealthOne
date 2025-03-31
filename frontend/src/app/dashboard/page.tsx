@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { MetricsCard } from "@/components/metrics-card";
 import { PieComponent } from "@/components/pie-chart";
 import { LineComponent } from "@/components/line-chart";
@@ -9,7 +8,6 @@ import CryptoDashboard from "@/app/crypto/page";
 import StockDashboard from "@/app/stocks/page";
 import {
   BarChart3,
-  ChevronDown,
   Globe,
   Home,
   LayoutDashboard,
@@ -179,7 +177,7 @@ export default function Dashboard() {
         </aside>
 
         {/* Main content */}
-        <main className="p-4 md:p-6 bg-black text-white overflow-x-hidden">
+        <main className=" bg-black text-white overflow-x-hidden">
           {renderContent()}
         </main>
       </div>

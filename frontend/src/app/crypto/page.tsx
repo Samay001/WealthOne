@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
 import { VaultTable } from "@/components/vault-table";
-import {
-  ChevronDown,
-} from "lucide-react";
+import CryptoData from "@/data/sample/crypto.json"
 
 export default function CryptoDashboard() {
+
   return (
     <div className="min-h-screen bg-black text-white w-full">
       <div className=" w-full">
@@ -23,8 +21,8 @@ export default function CryptoDashboard() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <MetricsCard
-              title="Your Balance"
-              value="$74,892"
+              title="Portfolio Value"
+              value= {CryptoData.portfolio_value}
               change={{
                 value: "$1,340",
                 percentage: "-2.1%",
@@ -32,8 +30,8 @@ export default function CryptoDashboard() {
               }}
             />
             <MetricsCard
-              title="Your Deposits"
-              value="$54,892"
+              title="Investment"
+              value= {CryptoData.total_invested}
               change={{
                 value: "$1,340",
                 percentage: "+13.2%",
@@ -41,8 +39,8 @@ export default function CryptoDashboard() {
               }}
             />
             <MetricsCard
-              title="Accrued Yield"
-              value="$20,892"
+              title="Return"
+              value= {CryptoData.total_return}
               change={{
                 value: "$1,340",
                 percentage: "+1.2%",
@@ -57,19 +55,7 @@ export default function CryptoDashboard() {
               </h2>
               <div className="flex gap-2">
                 <Button size="sm" variant="ghost" className="text-white">
-                  Today
-                </Button>
-                <Button size="sm" variant="ghost" className="text-white">
-                  Last week
-                </Button>
-                <Button size="sm" variant="ghost" className="text-white">
-                  Last month
-                </Button>
-                <Button size="sm" variant="ghost" className="text-white">
-                  Last 6 months
-                </Button>
-                <Button size="sm" variant="ghost" className="text-white">
-                  Year
+                  Monthly
                 </Button>
               </div>
             </div>
