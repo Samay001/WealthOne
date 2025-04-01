@@ -64,16 +64,6 @@ public class CoinDcxController {
         }
     }
 
-    @PostMapping("/user-info")
-    public ResponseEntity<?> getUserBalances() {
-        try {
-            return callApi("/exchange/v1/users/info", HttpMethod.POST, null);
-        } catch (ApiException e) {
-            logger.error("Error getting user balances", e);
-            return createErrorResponse(e);
-        }
-    }
-
     private ResponseEntity<Map<String, Object>> createErrorResponse(ApiException e) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", "error");
@@ -95,4 +85,37 @@ public class CoinDcxController {
             return statusCode;
         }
     }
+
+    @PostMapping("/user-info")
+    public ResponseEntity<?> getUserBalances() {
+        try {
+            return callApi("/exchange/v1/users/info", HttpMethod.POST, null);
+        } catch (ApiException e) {
+            logger.error("Error getting user balances", e);
+            return createErrorResponse(e);
+        }
+    }
+
+    @PostMapping("/trade-history")
+    public ResponseEntity<?> getTradeHistory() {
+        try {
+            return callApi("/exchange/v1/orders/trade_history", HttpMethod.POST, null);
+
+        } catch (ApiException e) {
+            logger.error("Error getting trade history", e);
+            return createErrorResponse(e);
+        }
+    }
+
+    @PostMapping("/active-orders")
+    public ResponseEntity<?> getActiveOrders() {
+        try {
+            return callApi("/exchange/v1/orders/active_orders", HttpMethod.POST, null);
+
+        } catch (ApiException e) {
+            logger.error("Error getting trade history", e);
+            return createErrorResponse(e);
+        }
+    }
+
 }
