@@ -2,18 +2,23 @@ package com.backend.wealth_one.controllers;
 
 import com.backend.wealth_one.models.User;
 import com.backend.wealth_one.services.AuthService;
+import com.backend.wealth_one.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth/v1")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
@@ -22,41 +27,39 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user){
-        if(authService.getUserByEmail(user.getEmail()).isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
+        if(authService.getUserByUsername(user.getUsername()).isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
         }
         return ResponseEntity.ok(authService.registerUser(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> credentials) {
-        String username = credentials.getOrDefault("username", "");
-        String password = credentials.getOrDefault("password", "");
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> body) {
+        String username = body.getOrDefault("username", "");
+        String password = body.getOrDefault("password", "");
 
-        Optional<User> user = authService.getUserByUsername(username);
-        System.out.println(user);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
 
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
-            return ResponseEntity.ok("Login successful");
+            String token = jwtUtil.generateToken(username);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("message", "Login successful");
+
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
     }
-
-    @GetMapping("/user/{username}")
-    public ResponseEntity<?> userDetails(@PathVariable String username) {
-        Optional<User> existingUser = authService.getUserByEmail(username);
-        if (existingUser.isPresent()) {
-            return ResponseEntity.ok(existingUser.get());
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-    }
-
-    @GetMapping("/test")
-    public String test(){
-        return "Working";
-    }
-
 }
