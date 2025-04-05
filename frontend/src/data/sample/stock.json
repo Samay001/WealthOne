@@ -1,10 +1,10 @@
 {
   "user_id": "STOCK_456",
   "username": "john_doe_stocks",
-  "total_stock_investment": 750000,
-  "current_stock_value": 925000,
-  "total_profit_loss": 175000,
-  "total_percentage_change": 23.33,
+  "total_portfolio_investment": "750000",
+  "current_portfolio_value": "925000",
+  "total_profit_loss": "175000",
+  "total_percentage_change": "23.33",
   "data": [
     {
       "isin": "INE528G01035",
@@ -27,7 +27,8 @@
       "collateral_update_quantity": 0,
       "t1_quantity": 0,
       "exchange": "NSE",
-      "logo_svg_url": "https://companieslogo.com/yes-bank/logo/"
+      "logo_svg_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Yes_Bank_SVG_Logo.svg/300px-Yes_Bank_SVG_Logo.svg.png?20141004043941",
+      "position":"EQUITY"
     },
     {
       "isin": "INE036A01016",
@@ -50,7 +51,8 @@
       "collateral_update_quantity": 0,
       "t1_quantity": 0,
       "exchange": "NSE",
-      "logo_svg_url": "https://cdnlogo.com/logo/reliance-infrastructure_52168.html"
+      "logo_svg_url": "https://seeklogo.com/images/R/reliance-industries-limited-logo-5C7739C7FD-seeklogo.com.png",
+      "position": "EQUITY"
     },
     {
       "isin": "INE009A01021",
@@ -73,7 +75,8 @@
       "collateral_update_quantity": 0,
       "t1_quantity": 0,
       "exchange": "NSE",
-      "logo_svg_url": "https://cdnlogo.com/logo/infosys_21965.html"
+      "logo_svg_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Infosys_logo.svg/400px-Infosys_logo.svg.png",
+      "position": "EQUITY"
     },
     {
       "isin": "INE467B01029",
@@ -96,7 +99,8 @@
       "collateral_update_quantity": 0,
       "t1_quantity": 0,
       "exchange": "NSE",
-      "logo_svg_url": "https://cdnlogo.com/logo/tcs_21966.html"
+      "logo_svg_url": "https://logowik.com/content/uploads/images/tcs-tata-consultancy-services2792.logowik.com.webp",
+      "position": "EQUITY"
     },
     {
       "isin": "INE062A01020",
@@ -119,7 +123,8 @@
       "collateral_update_quantity": 0,
       "t1_quantity": 0,
       "exchange": "NSE",
-      "logo_svg_url": "https://cdnlogo.com/logo/sbi_21967.html"
+      "logo_svg_url": "https://cdn.worldvectorlogo.com/logos/sbi-state-bank-of-india.svg",
+      "position": "EQUITY"
     }
   ]
 }

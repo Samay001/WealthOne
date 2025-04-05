@@ -36,6 +36,9 @@ export default function Dashboard() {
                   Aug 13, 2023 - Aug 18, 2023
                 </div>
               </div>
+              <div className="">
+                <h1 className="text-xl font-bold text-white">deep3</h1>
+              </div>
             </div>
 
             {/* Metrics Cards Section */}

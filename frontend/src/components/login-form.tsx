@@ -27,8 +27,12 @@ export function LoginForm({
     try {
       const url = isLogin ? "http://localhost:8080/auth/v1/login" : "http://localhost:8080/auth/v1/register";
       const data = isLogin ? { username, password } : { username, email, password };
-      console.log(data);
+      ;
       const res = await axios.post(url, data, { withCredentials: true });
+      
+      const jwt_token = res.data.token;
+      //store in local storage
+      
 
       if (res.status === 200) {
         if(isLogin){

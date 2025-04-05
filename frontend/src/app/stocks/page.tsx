@@ -4,9 +4,12 @@ import { Input } from "@/components/ui/input";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
 import { VaultTable } from "@/components/vault-table-stock";
+import StockData from "@/data/sample/stock.json";
+
 import {
   ChevronDown,
 } from "lucide-react";
+import { ST } from "next/dist/shared/lib/utils";
 
 export default function StockDashboard() {
   return (
@@ -24,7 +27,7 @@ export default function StockDashboard() {
           <div className="grid gap-4 md:grid-cols-3">
             <MetricsCard
               title="Your Balance"
-              value="$74,892"
+              value={StockData.current_portfolio_value}
               change={{
                 value: "$1,340",
                 percentage: "-2.1%",
@@ -33,7 +36,7 @@ export default function StockDashboard() {
             />
             <MetricsCard
               title="Your Deposits"
-              value="$54,892"
+              value={StockData.total_portfolio_investment}
               change={{
                 value: "$1,340",
                 percentage: "+13.2%",
@@ -41,8 +44,8 @@ export default function StockDashboard() {
               }}
             />
             <MetricsCard
-              title="Accrued Yield"
-              value="$20,892"
+              title="Return"
+              value={StockData.total_profit_loss}
               change={{
                 value: "$1,340",
                 percentage: "+1.2%",

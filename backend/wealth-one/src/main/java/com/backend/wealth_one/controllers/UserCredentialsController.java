@@ -31,6 +31,7 @@ public class UserCredentialsController {
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             System.out.println("Authenticated username: " + username);
+
             Optional<User> userOptional = userRepository.findByUsername(username);
 
             if (userOptional.isPresent()) {

@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function CredentialsForm() {
+  const router = useRouter();
+
   const [formData, setState] = useState({
     upstoxApiKey: "",
     upstoxApiSecret: "",
@@ -25,12 +28,18 @@ export default function CredentialsForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    const url = "http://localhost:8080/auth/v1/";
+    const url = "http://localhost:8080/api/v1/user-credentials";
+    console.log(formData);
+    console.log("jwt:", document.cookie);
+
     try {
-      const res = await axios.post(url, formData, {
-        headers: { "Content-Type": "application/json" }
+      const res = await axios.put(url, formData, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true 
       });
       console.log("Response:", res.data);
+      alert("user credentials updated successfully");
+      router.push("/dashboard");
     } 
     catch (error) {
       console.error("Error submitting form:", error);
