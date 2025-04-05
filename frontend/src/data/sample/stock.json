@@ -1,78 +1,125 @@
 {
-    "user_id": "STOCK_456",
-    "username": "john_doe_stocks",
-    "total_stock_investment": 750000,
-    "current_stock_value": 925000,
-    "total_profit_loss": 175000,
-    "total_percentage_change": 23.33,
-    "holdings": [
-      {
-        "id": "RELIANCE-001",
-        "symbol": "RELIANCE",
-        "name": "Reliance Industries",
-        "icon": "https://companieslogo.com/img/orig/RELIANCE.NS-128a8626.png",
-        "sector": "Energy",
-        "exchange": "NSE",
-        "total_shares": 50,
-        "purchase_history": [
-          {
-            "date": "2023-02-15",
-            "quantity": 30,
-            "buy_price": 2400,
-            "brokerage": 50
-          },
-          {
-            "date": "2023-07-01",
-            "quantity": 20,
-            "buy_price": 2600,
-            "brokerage": 40
-          }
-        ],
-        "total_investment": 244000,
-        "current_price": 2700,
-        "current_value": 135000,
-        "profit_loss": 11000,
-        "percentage_change": 8.87,
-        "dividends": [
-          {
-            "date": "2023-07-15",
-            "amount": 5000
-          }
-        ]
-      },
-      {
-        "id": "TCS-002",
-        "symbol": "TCS",
-        "name": "Tata Consultancy Services",
-        "icon": "https://companieslogo.com/img/orig/TCS.NS-74035a92.png",
-        "sector": "IT",
-        "exchange": "BSE",
-        "total_shares": 100,
-        "purchase_history": [
-          {
-            "date": "2023-01-10",
-            "quantity": 70,
-            "buy_price": 3200,
-            "brokerage": 70
-          },
-          {
-            "date": "2023-05-20",
-            "quantity": 30,
-            "buy_price": 3400,
-            "brokerage": 30
-          }
-        ],
-        "total_investment": 506000,
-        "current_price": 3500,
-        "current_value": 350000,
-        "profit_loss": 144000,
-        "percentage_change": 41.11,
-        "dividends": [
-          {
-            "date": "2023-04-01",
-            "amount": 7500
-          }
-        ]
-      }
-    ]
-  }
+  "user_id": "STOCK_456",
+  "username": "john_doe_stocks",
+  "total_stock_investment": 750000,
+  "current_stock_value": 925000,
+  "total_profit_loss": 175000,
+  "total_percentage_change": 23.33,
+  "data": [
+    {
+      "isin": "INE528G01035",
+      "cnc_used_quantity": 0,
+      "collateral_type": "WC",
+      "company_name": "YES BANK LTD.",
+      "haircut": 0.2,
+      "product": "D",
+      "quantity": 36,
+      "trading_symbol": "YESBANK",
+      "tradingsymbol": "YESBANK",
+      "last_price": 17.05,
+      "close_price": 17.05,
+      "pnl": -61.2,
+      "day_change": 0,
+      "day_change_percentage": 0,
+      "instrument_token": "NSE_EQ|INE528G01035",
+      "average_price": 18.75,
+      "collateral_quantity": 0,
+      "collateral_update_quantity": 0,
+      "t1_quantity": 0,
+      "exchange": "NSE",
+      "logo_svg_url": "https://companieslogo.com/yes-bank/logo/"
+    },
+    {
+      "isin": "INE036A01016",
+      "cnc_used_quantity": 0,
+      "collateral_type": "WC",
+      "company_name": "RELIANCE INFRASTRUCTURE LTD.",
+      "haircut": 1,
+      "product": "D",
+      "quantity": 1,
+      "trading_symbol": "RELINFRA",
+      "tradingsymbol": "RELINFRA",
+      "last_price": 174.85,
+      "close_price": 169.2,
+      "pnl": -17.7,
+      "day_change": 0,
+      "day_change_percentage": 0,
+      "instrument_token": "NSE_EQ|INE036A01016",
+      "average_price": 192.55,
+      "collateral_quantity": 0,
+      "collateral_update_quantity": 0,
+      "t1_quantity": 0,
+      "exchange": "NSE",
+      "logo_svg_url": "https://cdnlogo.com/logo/reliance-infrastructure_52168.html"
+    },
+    {
+      "isin": "INE009A01021",
+      "cnc_used_quantity": 0,
+      "collateral_type": "WC",
+      "company_name": "INFOSYS LTD.",
+      "haircut": 0.15,
+      "product": "D",
+      "quantity": 10,
+      "trading_symbol": "INFY",
+      "tradingsymbol": "INFY",
+      "last_price": 1500.0,
+      "close_price": 1495.0,
+      "pnl": 50.0,
+      "day_change": 5.0,
+      "day_change_percentage": 0.33,
+      "instrument_token": "NSE_EQ|INE009A01021",
+      "average_price": 1490.0,
+      "collateral_quantity": 0,
+      "collateral_update_quantity": 0,
+      "t1_quantity": 0,
+      "exchange": "NSE",
+      "logo_svg_url": "https://cdnlogo.com/logo/infosys_21965.html"
+    },
+    {
+      "isin": "INE467B01029",
+      "cnc_used_quantity": 0,
+      "collateral_type": "WC",
+      "company_name": "TATA CONSULTANCY SERVICES LTD.",
+      "haircut": 0.1,
+      "product": "D",
+      "quantity": 5,
+      "trading_symbol": "TCS",
+      "tradingsymbol": "TCS",
+      "last_price": 3500.0,
+      "close_price": 3480.0,
+      "pnl": 100.0,
+      "day_change": 20.0,
+      "day_change_percentage": 0.57,
+      "instrument_token": "NSE_EQ|INE467B01029",
+      "average_price": 3400.0,
+      "collateral_quantity": 0,
+      "collateral_update_quantity": 0,
+      "t1_quantity": 0,
+      "exchange": "NSE",
+      "logo_svg_url": "https://cdnlogo.com/logo/tcs_21966.html"
+    },
+    {
+      "isin": "INE062A01020",
+      "cnc_used_quantity": 0,
+      "collateral_type": "WC",
+      "company_name": "STATE BANK OF INDIA",
+      "haircut": 0.2,
+      "product": "D",
+      "quantity": 20,
+      "trading_symbol": "SBIN",
+      "tradingsymbol": "SBIN",
+      "last_price": 450.0,
+      "close_price": 445.0,
+      "pnl": 100.0,
+      "day_change": 5.0,
+      "day_change_percentage": 1.12,
+      "instrument_token": "NSE_EQ|INE062A01020",
+      "average_price": 440.0,
+      "collateral_quantity": 0,
+      "collateral_update_quantity": 0,
+      "t1_quantity": 0,
+      "exchange": "NSE",
+      "logo_svg_url": "https://cdnlogo.com/logo/sbi_21967.html"
+    }
+  ]
+}

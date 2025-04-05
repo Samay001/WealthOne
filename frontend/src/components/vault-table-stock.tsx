@@ -50,7 +50,6 @@ export function VaultTable() {
           <TableHead className="text-gray-400 font-bold">Balance</TableHead>
           <TableHead className="text-gray-400 font-bold">Market Cap</TableHead>
           <TableHead className="text-gray-400 font-bold">Start date</TableHead>
-          {/* <TableHead className="text-gray-400 font-bold">Liquidity</TableHead> */}
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>

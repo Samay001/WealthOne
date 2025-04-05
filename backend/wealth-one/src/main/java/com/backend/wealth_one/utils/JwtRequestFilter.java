@@ -27,6 +27,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
         final String authHeader = request.getHeader("Authorization");
 
         String username = null;
@@ -34,7 +35,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Skip filter for permitted endpoints
         String requestURI = request.getRequestURI();
-        if (requestURI.contains("/auth/v1/login") || requestURI.contains("/auth/v1/register")) {
+
+        if (requestURI.contains("/auth/v1/login") ||
+                requestURI.contains("/auth/v1/register") ||
+                requestURI.contains("/login") ||
+                requestURI.contains("/api/upstox/**") ||
+                requestURI.equals("/upstox/callback") ||
+                requestURI.startsWith("/upstox/callback/")) {
             filterChain.doFilter(request, response);
             return;
         }

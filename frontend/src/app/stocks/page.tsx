@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
-import { VaultTable } from "@/components/vault-table";
+import { VaultTable } from "@/components/vault-table-stock";
 import {
   ChevronDown,
 } from "lucide-react";

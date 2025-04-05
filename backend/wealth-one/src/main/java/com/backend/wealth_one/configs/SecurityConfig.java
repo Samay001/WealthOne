@@ -30,7 +30,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/v1/**").permitAll()
+                        .requestMatchers("/auth/v1/**",
+                                        "/api/upstox/**",
+                                        "/login",
+                                        "/upstox/callback",
+                                        "/upstox/callback/**"
+                                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess

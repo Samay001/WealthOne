@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
-import { VaultTable } from "@/components/vault-table";
+import { VaultTable } from "@/components/vault-table-crypto";
 import CryptoData from "@/data/sample/crypto.json"
 
 export default function CryptoDashboard() {

@@ -14,37 +14,13 @@ import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/upstox")
 public class UpstoxController {
 
     private final UpstoxAuthService upstoxAuthService;
-
     @Autowired
     public UpstoxController(UpstoxAuthService upstoxAuthService) {
         this.upstoxAuthService = upstoxAuthService;
-    }
-
-    // Route to start the OAuth flow
-    @GetMapping("/login")
-    public RedirectView login() {
-        String authUrl = upstoxAuthService.getAuthorizationUrl();
-        return new RedirectView(authUrl);
-    }
-
-    // Callback route for OAuth redirect
-    @GetMapping("/upstox/callback")
-    public String callback(@RequestParam("code") String code, HttpSession session) {
-        try {
-            // Exchange the authorization code for access token
-            Map<String, Object> tokenData = upstoxAuthService.getAccessToken(code);
-
-            // Store tokens in session
-            session.setAttribute("accessToken", tokenData.get("accessToken"));
-            session.setAttribute("refreshToken", tokenData.get("refreshToken"));
-
-            return "Authentication successful! You can now use the API.";
-        } catch (Exception e) {
-            return "Authentication failed: " + e.getMessage();
-        }
     }
 
     // Example route to get user profile
@@ -68,15 +44,35 @@ public class UpstoxController {
         }
     }
 
-    @GetMapping("/orders-history")
-    public ResponseEntity<?> getOrdersHistory(){
-        try{
-            Map<String,Object> orderHistory = upstoxAuthService.makeRequest(HttpMethod.GET, "/order/history", null);
-            return ResponseEntity.ok(orderHistory);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+    @GetMapping("/trades-history")
+    public ResponseEntity<?> getOrdersHistory() {
+        try {
+            String segment = "EQ";
+            String startDate = "2024-01-01";
+            String endDate = "2025-01-01";
+            int pageNumber = 1;
+            int pageSize = 100;
 
+            String endpoint = String.format(
+                    "/charges/historical-trades?segment=%s&start_date=%s&end_date=%s&page_number=%d&page_size=%d",
+                    segment, startDate, endDate, pageNumber, pageSize
+            );
+
+            Map<String, Object> orderHistory = upstoxAuthService.makeRequest(HttpMethod.GET, endpoint, null);
+
+            return ResponseEntity.ok(orderHistory);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/holdings")
+    public ResponseEntity<Map<String, Object>> getHoldings() {
+        try {
+            Map<String, Object> funds = upstoxAuthService.makeRequest(HttpMethod.GET, "/portfolio/long-term-holdings", null);
+            return ResponseEntity.ok(funds);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 
