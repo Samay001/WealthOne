@@ -3,10 +3,11 @@ import HoverBorderGradientDemo from "@/components/hover-border";
 import Link from "next/link";
 
 const Main = () => {
+
   return (
     <div
       data-framer-background-image-wrapper="true"
-      className="absolute inset-0 rounded-inherit"
+      className="absolute inset-0 rounded-inherit scroll-smooth"
     >
       <img
         decoding="async"
