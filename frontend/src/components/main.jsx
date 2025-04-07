@@ -43,7 +43,7 @@ const Main = () => {
           Manage all your portfolio at same place.
         </p>
         <div className="flex justify-center">
-          <Link href="/register">
+          <Link href="/dashboard">
             <HoverBorderGradientDemo />
           </Link>
         </div>

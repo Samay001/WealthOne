@@ -1,15 +1,51 @@
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
 import { VaultTable } from "@/components/vault-table-crypto";
-import CryptoData from "@/data/sample/crypto.json"
+
+// Define types for the metrics
+interface PortfolioMetrics {
+  totalBalance: number;
+  totalInvested: number;
+  totalReturn: number;
+  totalReturnPercentage: number;
+}
+
+// Define type for the change prop in MetricsCard
+interface MetricChange {
+  value: string;
+  percentage: string;
+  isPositive: boolean;
+}
 
 export default function CryptoDashboard() {
+  // Set up state to store metrics with proper type annotation
+  const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics>({
+    totalBalance: 0,
+    totalInvested: 0,
+    totalReturn: 0,
+    totalReturnPercentage: 0
+  });
+
+  // Type the metrics parameter in the callback
+  const handleMetricsUpdate = useCallback((metrics: PortfolioMetrics) => {
+    setPortfolioMetrics(metrics);
+  }, []);
+
+  // Add return type annotation to formatCurrency
+  const formatCurrency = (value: number): string => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2
+    }).format(value);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white w-full">
-      <div className=" w-full">
+      <div className="w-full">
         <main className="p-6 bg-black text-white w-full">
           <div className="mb-6 flex items-center justify-between">
             <div className="space-y-1">
@@ -21,31 +57,30 @@ export default function CryptoDashboard() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <MetricsCard
-              title="Portfolio Value"
-              value= {CryptoData.portfolio_value}
+              title="Crypto Value"
+              value={formatCurrency(portfolioMetrics.totalBalance)}
               change={{
-                value: "$1,340",
-                percentage: "-2.1%",
-                isPositive: false,
-              }}
+                value: formatCurrency(portfolioMetrics.totalReturn),
+                percentage: `${portfolioMetrics.totalReturnPercentage > 0 ? '+' : ''}${portfolioMetrics.totalReturnPercentage.toFixed(2)}%`,
+                isPositive: portfolioMetrics.totalReturn >= 0
+              } as MetricChange}
             />
             <MetricsCard
               title="Investment"
-              value= {CryptoData.total_invested}
+              value={formatCurrency(portfolioMetrics.totalInvested)}
               change={{
-                value: "$1,340",
-                percentage: "+13.2%",
-                isPositive: true,
-              }}
+                value: "",
+                percentage: "",
+              } as MetricChange}
             />
             <MetricsCard
               title="Return"
-              value= {CryptoData.total_return}
+              value={formatCurrency(portfolioMetrics.totalReturn)}
               change={{
-                value: "$1,340",
-                percentage: "+1.2%",
-                isPositive: true,
-              }}
+                value: "",
+                percentage: `${portfolioMetrics.totalReturnPercentage > 0 ? '+' : ''}${portfolioMetrics.totalReturnPercentage.toFixed(2)}%`,
+                isPositive: portfolioMetrics.totalReturn >= 0
+              } as MetricChange}
             />
           </div>
           <Card className="mt-6 p-6 bg-[#09090B] border-white/20">
@@ -62,7 +97,8 @@ export default function CryptoDashboard() {
             <StatsChart />
           </Card>
           <div className="mt-6">
-            <VaultTable />
+            {/* Pass the stable callback function to VaultTable */}
+            <VaultTable onMetricsUpdate={handleMetricsUpdate} />
           </div>
         </main>
       </div>
