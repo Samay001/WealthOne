@@ -24,7 +24,7 @@ export function MetricsCard({ title, value, change, chart }: MetricsCardProps) {
         <div>
           <p className="text-2xl font-bold">{value}</p>
           <div className="flex items-center gap-1 mt-1">
-            <span className="text-sm">+{change.value}</span>
+            <span className="text-sm">{change.value}</span>
             <span className={`text-sm ${change.isPositive ? "text-green-500" : "text-red-500"}`}>
               {change.percentage}
             </span>

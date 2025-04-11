@@ -36,7 +36,8 @@ public class SecurityConfig {
                                         "/upstox/callback",
                                         "/upstox/callback/**",
                                         "/api/v1/**",
-                                        "/api/crypto/**"
+                                        "/api/crypto/**",
+                                        "/api/coindcx/**"
                                         ).permitAll()
                         .anyRequest().authenticated()
                 )

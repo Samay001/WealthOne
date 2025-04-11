@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+// components/vault-table-crypto.tsx
 import { Avatar } from "@/components/ui/avatar";
 import {
   Table,
@@ -8,138 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import data from "@/data/sample/crypto.json";
 import symbolData from "@/data/sample/crypto-mapping.json";
-import axios from "axios";
+import { useVault } from "@/app/context/cryptoContext";
 
-// Define types for better TypeScript support
-type Asset = {
-  market: string;
-  coin_image: string;
-  order_type: string;
-  avg_price: number;
-  total_quantity: number;
-  fee_amount: number;
-  created_at: string;
-};
-
-type Prices = {
-  [key: string]: number | null;
-};
-
-type SymbolMapping = {
-  [key: string]: string;
-};
-
-type VaultTableProps = {
-  onMetricsUpdate: (metrics: {
-    totalBalance: number;
-    totalInvested: number;
-    totalReturn: number;
-    totalReturnPercentage: number;
-  }) => void;
-};
-
-export function VaultTable({ onMetricsUpdate }: VaultTableProps) {
-  const [prices, setPrices] = useState<Prices>({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Use useMemo to prevent assets from being recreated on each render
-  const assets = useMemo(() => data.assets as Asset[], []);
-
-  // Keep track of whether metrics have been sent to avoid multiple updates
-  const [metricsSent, setMetricsSent] = useState(false);
-
-  // Calculate and update metrics only when prices are updated and not already sent
-  useEffect(() => {
-    // Only calculate metrics when we have prices and they haven't been sent yet
-    if (!loading && Object.keys(prices).length > 0 && !metricsSent) {
-      const totalInvested = assets.reduce(
-        (sum, asset) =>
-          sum + asset.avg_price * asset.total_quantity + asset.fee_amount,
-        0
-      );
-
-      const totalCurrent = assets.reduce(
-        (sum, asset) =>
-          sum + (prices[asset.market] || 0) * asset.total_quantity,
-        0
-      );
-
-      const totalReturn = totalCurrent - totalInvested;
-      const totalReturnPercentage =
-        totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0;
-
-      // Send metrics up to dashboard
-      onMetricsUpdate({
-        totalBalance: totalCurrent,
-        totalInvested: totalInvested,
-        totalReturn: totalReturn,
-        totalReturnPercentage: totalReturnPercentage,
-      });
-      
-      // Mark metrics as sent to prevent further updates
-      setMetricsSent(true);
-    }
-  }, [prices, loading, onMetricsUpdate, assets, metricsSent]);
-
-  // Fetch prices only once on component mount
-  useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        setLoading(true);
-        const newPrices: Prices = {};
-
-        const uniqueMarkets = Array.from(
-          new Set(assets.map((asset) => asset.market))
-        );
-
-        const requests = uniqueMarkets.map(async (market) => {
-          // Use the symbolData mapping to get the correct cryptoId
-          const cryptoId = (symbolData as SymbolMapping)[market];
-
-          if (!cryptoId) {
-            console.error(`No mapping found for market: ${market}`);
-            newPrices[market] = null;
-            return;
-          }
-
-          try {
-            const response = await axios.get(
-              `http://localhost:8080/api/crypto/prices`,
-              {
-                params: {
-                  ids: cryptoId.toLowerCase(),
-                  vs_currencies: "inr",
-                },
-                withCredentials: true,
-              }
-            );
-            newPrices[market] =
-              response.data?.[cryptoId.toLowerCase()]?.inr || null;
-          } catch (err) {
-            console.error(`Error fetching price for ${market}:`, err);
-            newPrices[market] = null;
-          }
-        });
-
-        // Wait for all requests to complete
-        await Promise.all(requests);
-
-        setPrices(newPrices);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching prices:", err);
-        setError("Failed to fetch prices");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPrices();
-    // Empty dependency array ensures this only runs once on mount
-  }, []);
+export function VaultTable() {
+  const { aggregatedAssets, prices, loading, error } = useVault();
 
   if (loading) {
     return <div className="p-4 text-center">Loading prices...</div>;
@@ -168,32 +41,36 @@ export function VaultTable({ onMetricsUpdate }: VaultTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {assets.map((asset) => {
-          const currentPrice = prices[asset.market] || 0;
+        {aggregatedAssets.map((asset) => {
+          const currentPrice = prices[asset.symbol] || 0;
           const investment =
-            asset.total_quantity * asset.avg_price + asset.fee_amount;
-          const currentValue = asset.total_quantity * currentPrice;
+            asset.totalQuantity * asset.avgBuyPrice + asset.totalFee;
+          const currentValue = asset.totalQuantity * currentPrice;
           const profitLoss = currentValue - investment;
           const profitLossPercentage =
             investment > 0 ? (profitLoss / investment) * 100 : 0;
 
           return (
             <TableRow
-              key={`${asset.market}-${asset.created_at}`}
+              key={asset.symbol}
               className="hover:bg-[#131316] border-white/20"
             >
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <img src={asset.coin_image} alt={asset.market} />
+                    <img
+                      src={
+                        (symbolData as Record<string, { name: string; svg_url: string }>)[asset.symbol]?.svg_url || "/placeholder.png"
+                      }
+                      alt={asset.symbol}
+                    />
                   </Avatar>
                   <div>
                     <div className="font-medium">
-                      {(symbolData as SymbolMapping)[asset.market] ||
-                        asset.market}
+                      {symbolData[asset.symbol as keyof typeof symbolData]?.name || asset.symbol}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {asset.market}
+                      {asset.symbol}
                     </div>
                   </div>
                 </div>
@@ -221,13 +98,15 @@ export function VaultTable({ onMetricsUpdate }: VaultTableProps) {
 
               <TableCell>
                 ₹
-                {asset.avg_price.toLocaleString("en-IN", {
+                {asset.avgBuyPrice.toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
                 })}
               </TableCell>
 
               <TableCell>
-                {asset.total_quantity.toLocaleString("en-IN")}
+                {asset.totalQuantity.toLocaleString("en-IN", {
+                  maximumFractionDigits: 8,
+                })}
               </TableCell>
 
               <TableCell>

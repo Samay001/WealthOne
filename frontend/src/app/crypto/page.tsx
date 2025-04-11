@@ -1,47 +1,14 @@
-import { useState, useCallback } from "react";
+// pages/CryptoDashboard.tsx
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MetricsCard } from "@/components/metrics-card";
 import { StatsChart } from "@/components/stats-chart";
 import { VaultTable } from "@/components/vault-table-crypto";
+import { VaultProvider, useVault } from "@/app/context/cryptoContext";
 
-// Define types for the metrics
-interface PortfolioMetrics {
-  totalBalance: number;
-  totalInvested: number;
-  totalReturn: number;
-  totalReturnPercentage: number;
-}
-
-// Define type for the change prop in MetricsCard
-interface MetricChange {
-  value: string;
-  percentage: string;
-  isPositive: boolean;
-}
-
-export default function CryptoDashboard() {
-  // Set up state to store metrics with proper type annotation
-  const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics>({
-    totalBalance: 0,
-    totalInvested: 0,
-    totalReturn: 0,
-    totalReturnPercentage: 0
-  });
-
-  // Type the metrics parameter in the callback
-  const handleMetricsUpdate = useCallback((metrics: PortfolioMetrics) => {
-    setPortfolioMetrics(metrics);
-  }, []);
-
-  // Add return type annotation to formatCurrency
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 2
-    }).format(value);
-  };
+// Dashboard content that uses the context
+const DashboardContent = () => {
+  const { metrics, formatCurrency, getMetricChange } = useVault();
 
   return (
     <div className="min-h-screen bg-black text-white w-full">
@@ -50,37 +17,23 @@ export default function CryptoDashboard() {
           <div className="mb-6 flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-bold text-white">Crypto Overview</h1>
-              <div className="text-sm text-white/50">
-                Aug 13, 2023 - Aug 18, 2023
-              </div>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <MetricsCard
               title="Crypto Value"
-              value={formatCurrency(portfolioMetrics.totalBalance)}
-              change={{
-                value: formatCurrency(portfolioMetrics.totalReturn),
-                percentage: `${portfolioMetrics.totalReturnPercentage > 0 ? '+' : ''}${portfolioMetrics.totalReturnPercentage.toFixed(2)}%`,
-                isPositive: portfolioMetrics.totalReturn >= 0
-              } as MetricChange}
+              value={formatCurrency(metrics.totalBalance)}
+              change={getMetricChange('totalBalance')}
             />
             <MetricsCard
               title="Investment"
-              value={formatCurrency(portfolioMetrics.totalInvested)}
-              change={{
-                value: "",
-                percentage: "",
-              } as MetricChange}
+              value={formatCurrency(metrics.totalInvested)}
+              change={getMetricChange('totalInvested')}
             />
             <MetricsCard
               title="Return"
-              value={formatCurrency(portfolioMetrics.totalReturn)}
-              change={{
-                value: "",
-                percentage: `${portfolioMetrics.totalReturnPercentage > 0 ? '+' : ''}${portfolioMetrics.totalReturnPercentage.toFixed(2)}%`,
-                isPositive: portfolioMetrics.totalReturn >= 0
-              } as MetricChange}
+              value={formatCurrency(metrics.totalReturn)}
+              change={getMetricChange('totalReturn')}
             />
           </div>
           <Card className="mt-6 p-6 bg-[#09090B] border-white/20">
@@ -97,11 +50,20 @@ export default function CryptoDashboard() {
             <StatsChart />
           </Card>
           <div className="mt-6">
-            {/* Pass the stable callback function to VaultTable */}
-            <VaultTable onMetricsUpdate={handleMetricsUpdate} />
+            {/* VaultTable now gets data from context */}
+            <VaultTable />
           </div>
         </main>
       </div>
     </div>
+  );
+};
+
+// Main Dashboard component with provider wrapper
+export default function CryptoDashboard() {
+  return (
+    <VaultProvider>
+      <DashboardContent />
+    </VaultProvider>
   );
 }

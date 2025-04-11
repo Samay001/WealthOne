@@ -31,24 +31,28 @@ public class CoinDcxController {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public ResponseEntity<String> callApi(String endpoint, HttpMethod method, Map<String, Object> additionalParams) throws ApiException {
+    public ResponseEntity<String> callApi(String endpoint, HttpMethod method, Map<String, Object> body) throws ApiException {
         try {
-            // Create base request body with timestamp
-            Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", System.currentTimeMillis());
+            // Create base payload with timestamp
+            Map<String, Object> payload = new HashMap<>();
+            long timestamp = System.currentTimeMillis();
+            payload.put("timestamp", timestamp);
 
-            // Add any additional parameters
-            if (additionalParams != null) {
-                body.putAll(additionalParams);
+            // Add additional request body parameters
+            if (body != null) {
+                payload.putAll(body);
             }
 
-            // Get authentication headers
-            HttpHeaders headers = authService.generateAuthHeaders(body);
+            // Debugging: log full payload
+            System.out.println("Payload: " + new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(payload));
 
-            // Create HTTP entity
-            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, headers);
+            // Generate auth headers with correct payload
+            HttpHeaders headers = authService.generateAuthHeaders(payload);
 
-            // Make the request
+            // Wrap payload and headers into HTTP request
+            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(payload, headers);
+
+            // Make the actual API call
             return restTemplate.exchange(
                     baseUrl + endpoint,
                     method,
@@ -63,6 +67,8 @@ public class CoinDcxController {
             throw new ApiException("Error calling API: " + e.getMessage(), e, 500);
         }
     }
+
+
 
     private ResponseEntity<Map<String, Object>> createErrorResponse(ApiException e) {
         Map<String, Object> errorResponse = new HashMap<>();
@@ -87,9 +93,19 @@ public class CoinDcxController {
     }
 
     @PostMapping("/user-info")
-    public ResponseEntity<?> getUserBalances() {
+    public ResponseEntity<?> getUserInfo() {
         try {
             return callApi("/exchange/v1/users/info", HttpMethod.POST, null);
+        } catch (ApiException e) {
+            logger.error("Error getting user balances", e);
+            return createErrorResponse(e);
+        }
+    }
+
+    @PostMapping("/user-balance")
+    public ResponseEntity<?> getUserBalances() {
+        try {
+            return callApi("/exchange/v1/users/balances", HttpMethod.POST, null);
         } catch (ApiException e) {
             logger.error("Error getting user balances", e);
             return createErrorResponse(e);
@@ -99,18 +115,7 @@ public class CoinDcxController {
     @PostMapping("/trade-history")
     public ResponseEntity<?> getTradeHistory() {
         try {
-            return callApi("/exchange/v1/orders/trade_history", HttpMethod.POST, null);
-
-        } catch (ApiException e) {
-            logger.error("Error getting trade history", e);
-            return createErrorResponse(e);
-        }
-    }
-
-    @PostMapping("/active-orders")
-    public ResponseEntity<?> getActiveOrders() {
-        try {
-            return callApi("/exchange/v1/orders/active_orders", HttpMethod.POST, null);
+            return callApi("/exchange/v1/orders/trade_history?sort=desc", HttpMethod.POST, null);
 
         } catch (ApiException e) {
             logger.error("Error getting trade history", e);
