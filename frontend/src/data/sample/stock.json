@@ -1,10 +1,4 @@
 {
-  "user_id": "STOCK_456",
-  "username": "john_doe_stocks",
-  "total_portfolio_investment": "750000",
-  "current_portfolio_value": "925000",
-  "total_profit_loss": "175000",
-  "total_percentage_change": "23.33",
   "data": [
     {
       "isin": "INE528G01035",

@@ -1,20 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import { ArrowUpRight, CheckCircle, ArrowUp } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -88,16 +77,8 @@ export default function Footer() {
         </h1>
       </main>
 
-      {/* Scroll to top button (fixed) */}
-      {scrolled && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-          aria-label="Scroll to top"
-        >
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      )}
+      {/* Add the ChatBot component here */}
+      {/* <ChatBot /> */}
     </div>
   );
 }

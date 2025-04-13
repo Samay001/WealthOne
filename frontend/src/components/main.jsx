@@ -1,13 +1,10 @@
 import React from "react";
-import HoverBorderGradientDemo from "@/components/hover-border";
-import Link from "next/link";
 
 const Main = () => {
-
   return (
     <div
       data-framer-background-image-wrapper="true"
-      className="absolute inset-0 rounded-inherit scroll-smooth"
+      className="absolute inset-0 rounded-inherit scroll-smooth "
     >
       <img
         decoding="async"
@@ -42,11 +39,7 @@ const Main = () => {
         <p className="mb-6 text-sm font-light tracking-wide text-gray-300 sm:text-base">
           Manage all your portfolio at same place.
         </p>
-        <div className="flex justify-center">
-          <Link href="/dashboard">
-            <HoverBorderGradientDemo />
-          </Link>
-        </div>
+
       </div>
     </div>
   );

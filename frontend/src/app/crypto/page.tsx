@@ -14,9 +14,12 @@ const DashboardContent = () => {
     <div className="min-h-screen bg-black text-white w-full">
       <div className="w-full">
         <main className="p-6 bg-black text-white w-full">
-          <div className="mb-6 flex items-center justify-between">
-            <div className="space-y-1">
+          <div className="mb-6">
+            <div className="space-y-1 mb-2">
               <h1 className="text-2xl font-bold text-white">Crypto Overview</h1>
+            </div>
+            <div className="text-sm text-white/50">
+                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">

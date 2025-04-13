@@ -6,6 +6,7 @@ import { PieComponent } from "@/components/pie-chart";
 import { LineComponent } from "@/components/line-chart";
 import CryptoDashboard from "@/app/crypto/page";
 import StockDashboard from "@/app/stocks/page";
+import Link from "next/link";
 import {
   BarChart3,
   Globe,
@@ -98,11 +99,14 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Mobile header */}
+
       <div className="lg:hidden flex items-center justify-between h-16 border-b border-white/20 px-4">
-        <div className="flex items-center gap-2">
-          <Wallet className="h-6 w-6 text-white" />
-          <span className="font-bold text-white">Wealth One</span>
-        </div>
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Wallet className="h-6 w-6 text-white" />
+            <span className="font-bold text-white">Wealth One</span>
+          </div>
+        </Link>
         <Button variant="ghost" onClick={toggleSidebar} className="text-white">
           {sidebarOpen ? (
             <X className="h-6 w-6" />
@@ -120,10 +124,12 @@ export default function Dashboard() {
           lg:relative lg:block border-r border-white/20 bg-black
         `}
         >
-          <div className="hidden lg:flex h-16 items-center gap-2 border-b border-white/20 px-6">
-            <Wallet className="h-6 w-6 text-white" />
-            <span className="font-bold text-white">Wealth One</span>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="hidden lg:flex h-16 items-center gap-2 border-b border-white/20 px-6">
+              <Wallet className="h-6 w-6 text-white" />
+              <span className="font-bold text-white">Wealth One</span>
+            </div>
+          </Link>
           {sidebarOpen && (
             <div className="flex lg:hidden items-center justify-end p-4">
               <Button
@@ -168,13 +174,6 @@ export default function Dashboard() {
             >
               <Globe className="h-4 w-4 text-white" />
               Crypto
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 text-white"
-            >
-              <Home className="h-4 w-4 text-white" />
-              Crypto Market
             </Button>
           </nav>
         </aside>

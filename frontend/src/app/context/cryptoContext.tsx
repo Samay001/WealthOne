@@ -1,10 +1,8 @@
-// context/VaultContext.tsx
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import symbolData from '@/data/sample/crypto-mapping.json';
 import transactionData from '@/data/sample/crypto.json';
 
-// Types
 export type Transaction = {
   id: number;
   order_id: string;
@@ -48,7 +46,6 @@ export type DateRange = {
   endDate: Date;
 };
 
-// Context type
 type VaultContextType = {
   transactions: Transaction[];
   setTransactions: (transactions: Transaction[]) => void;
@@ -63,7 +60,6 @@ type VaultContextType = {
   getMetricChange: (metric: keyof PortfolioMetrics) => MetricChange;
 };
 
-// Create context with default values
 const VaultContext = createContext<VaultContextType>({
   transactions: [],
   setTransactions: () => {},
@@ -104,7 +100,6 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
     endDate: new Date(),                                       // Today
   });
 
-  // Utility function for formatting currency
   const formatCurrency = useCallback((value: number): string => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -113,7 +108,6 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
     }).format(value);
   }, []);
 
-  // Utility function to get metric change data
   const getMetricChange = useCallback((metric: keyof PortfolioMetrics): MetricChange => {
     if (metric === 'totalBalance') {
       return {
@@ -142,7 +136,6 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [metrics, formatCurrency]);
 
-  // Aggregate transactions by symbol to calculate current holdings
   const aggregatedAssets = useMemo(() => {
     const assetMap = new Map<string, AggregatedAsset>();
 
@@ -305,7 +298,6 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook to use the vault context
 export const useVault = () => {
   const context = useContext(VaultContext);
   if (context === undefined) {

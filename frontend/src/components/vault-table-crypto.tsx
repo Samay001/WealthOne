@@ -1,4 +1,3 @@
-// components/vault-table-crypto.tsx
 import { Avatar } from "@/components/ui/avatar";
 import {
   Table,
