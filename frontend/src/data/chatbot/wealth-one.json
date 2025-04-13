@@ -1,0 +1,64 @@
+{
+  "appName": "Wealth One",
+  "description": "Wealth One is a unified platform for analyzing funds, allowing users to track and analyze their investments in Indian stocks and cryptocurrencies using AI-powered insights.",
+  "features": {
+    "dashboard": "Interactive dashboard to view overall portfolio performance and trends.",
+    "aiAssistant": "Gemini-powered AI agent to provide personalized insights on user portfolio.",
+    "cryptoIntegration": "Real-time cryptocurrency data via CoinDCX API.",
+    "stockIntegration": "Indian stock market data via Upstox API.",
+    "portfolioAnalysis": "Detailed breakdown of holdings, gains/losses, and risk insights.",
+    "userQueries": "Users can ask portfolio-related questions and receive smart answers.",
+    "responsiveDesign": "Fully responsive interface optimized for mobile, tablet, and desktop."
+  },
+  "technologies": {
+    "frontend": ["React.js", "Tailwind CSS", "Next.js"],
+    "backend": [
+      "Node.js",
+      "Next.js API Routes",
+      "Google Generative AI (Gemini)",
+      "Express (optional)"
+    ],
+    "APIs": ["CoinDCX", "Upstox", "Google Generative AI"],
+    "hosting": ["Vercel or custom deployment"],
+    "auth": ["JWT-based auth or Firebase (optional)"]
+  },
+  "aiAssistant": {
+    "model": "Gemini 2.0 Flash",
+    "apiProvider": "Google Generative AI",
+    "promptFormatting": {
+      "emphasis": "Uses **bold** for key points and *italic* for emphasis",
+      "responseStyle": "Short, concise, and formatted for readability"
+    },
+    "contextData": "Portfolio details from a static or dynamic JSON file",
+    "customization": {
+      "queryTypes": ["crypto", "stocks", "summary"],
+      "responseLength": "Brief and focused"
+    }
+  },
+  "apiIntegration": {
+    "coinDCX": {
+      "purpose": "Fetch real-time data for cryptocurrencies",
+      "endpointsUsed": ["/market_data", "/ticker"]
+    },
+    "upstox": {
+      "purpose": "Get Indian stock data, including price, volume, and trends",
+      "authentication": "Access token via OAuth",
+      "endpointsUsed": ["/quotes", "/positions", "/portfolio"]
+    }
+  },
+  "sampleUserQuery": [
+    "What are my top-performing assets?",
+    "Give a summary of my crypto holdings.",
+    "Should I rebalance my portfolio?",
+    "What is the total value of my investments today?"
+  ],
+  "developer": {
+    "name": "Samay",
+    "github": "https://github.com/samay0001",
+    "portfolio": "https://your-portfolio-link.com",
+    "contact": "youremail@example.com"
+  },
+  "status": "In Development",
+  "version": "1.0.0",
+  "lastUpdated": "2025-04-14"
+}
