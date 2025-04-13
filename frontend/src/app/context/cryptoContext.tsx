@@ -46,6 +46,11 @@ export type DateRange = {
   endDate: Date;
 };
 
+type DataAvailability = {
+  transactions: boolean;
+  prices: boolean;
+};
+
 type VaultContextType = {
   transactions: Transaction[];
   setTransactions: (transactions: Transaction[]) => void;
@@ -58,6 +63,7 @@ type VaultContextType = {
   setDateRange: (range: DateRange) => void;
   formatCurrency: (value: number) => string;
   getMetricChange: (metric: keyof PortfolioMetrics) => MetricChange;
+  dataAvailable: DataAvailability;
 };
 
 const VaultContext = createContext<VaultContextType>({
@@ -74,20 +80,21 @@ const VaultContext = createContext<VaultContextType>({
     totalReturnPercentage: 0,
   },
   dateRange: {
-    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    endDate: new Date(),                                       // Today
+    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    endDate: new Date(),
   },
   setDateRange: () => {},
   formatCurrency: () => "",
   getMetricChange: () => ({ value: "", percentage: "", isPositive: true }),
+  dataAvailable: {
+    transactions: false,
+    prices: false
+  }
 });
 
-// Provider component
 export const VaultProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize with transactionData from the import
   const [transactions, setTransactions] = useState<Transaction[]>(transactionData as Transaction[]);
   const [prices, setPrices] = useState<Prices>({});
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<PortfolioMetrics>({
     totalBalance: 0,
@@ -96,9 +103,18 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
     totalReturnPercentage: 0,
   });
   const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    endDate: new Date(),                                       // Today
+    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    endDate: new Date(),
   });
+  const [dataAvailable, setDataAvailable] = useState<DataAvailability>({
+    transactions: false,
+    prices: false
+  });
+
+  // Initialize transactions
+  useEffect(() => {
+    setDataAvailable(prev => ({...prev, transactions: true}));
+  }, []);
 
   const formatCurrency = useCallback((value: number): string => {
     return new Intl.NumberFormat('en-IN', {
@@ -109,34 +125,35 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const getMetricChange = useCallback((metric: keyof PortfolioMetrics): MetricChange => {
-    if (metric === 'totalBalance') {
-      return {
-        value: formatCurrency(metrics.totalReturn),
-        percentage: `${metrics.totalReturnPercentage > 0 ? '+' : '-'}${Math.abs(metrics.totalReturnPercentage).toFixed(2)}%`,
-        isPositive: metrics.totalReturn >= 0
-      };
-    } else if (metric === 'totalInvested') {
-      return {
-        value: "",
-        percentage: "",
-        isPositive: true
-      };
-    } else if (metric === 'totalReturn') {
-      return {
-        value: "",
-        percentage: `${metrics.totalReturnPercentage > 0 ? '+' : '-'}${Math.abs(metrics.totalReturnPercentage).toFixed(2)}%`,
-        isPositive: metrics.totalReturn >= 0
-      };
-    } else {
-      return {
-        value: "",
-        percentage: "",
-        isPositive: true
-      };
+    const value = metrics[metric];
+    const isPositive = value >= 0;
+    const sign = isPositive ? '+' : '-';
+
+    switch(metric) {
+      case 'totalBalance':
+        return {
+          value: formatCurrency(metrics.totalReturn),
+          percentage: `${sign}${Math.abs(metrics.totalReturnPercentage).toFixed(2)}%`,
+          isPositive
+        };
+      case 'totalReturn':
+        return {
+          value: formatCurrency(metrics.totalReturn),
+          percentage: `${sign}${Math.abs(metrics.totalReturnPercentage).toFixed(2)}%`,
+          isPositive
+        };
+      default:
+        return {
+          value: "",
+          percentage: "",
+          isPositive: true
+        };
     }
   }, [metrics, formatCurrency]);
 
   const aggregatedAssets = useMemo(() => {
+    if (!dataAvailable.transactions) return [];
+
     const assetMap = new Map<string, AggregatedAsset>();
 
     transactions.forEach((transaction) => {
@@ -161,138 +178,149 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
       const asset = assetMap.get(symbol)!;
 
       if (side === "buy") {
-        // Calculate new average price for buys
         const currentValue = asset.totalQuantity * asset.avgBuyPrice;
         const newValue = quantity * price;
         const totalQuantity = asset.totalQuantity + quantity;
 
-        asset.avgBuyPrice =
-          totalQuantity > 0 ? (currentValue + newValue) / totalQuantity : 0;
+        asset.avgBuyPrice = totalQuantity > 0 ? (currentValue + newValue) / totalQuantity : 0;
         asset.totalQuantity += quantity;
-        asset.totalFee += fee;
       } else {
-        // For sells, just reduce the quantity
         asset.totalQuantity -= quantity;
-        asset.totalFee += fee;
       }
 
-      // Update the timestamp if this transaction is newer
-      if (timestamp > asset.lastUpdated) {
-        asset.lastUpdated = timestamp;
-      }
+      asset.totalFee += fee;
+      asset.lastUpdated = Math.max(asset.lastUpdated, timestamp);
     });
 
-    // Filter out assets with zero or negative quantity
     return Array.from(assetMap.values())
       .filter((asset) => asset.totalQuantity > 0)
       .sort((a, b) => b.lastUpdated - a.lastUpdated);
-  }, [transactions]);
+  }, [transactions, dataAvailable.transactions]);
 
-  // Fetch prices
-  useEffect(() => {
-    const fetchPrices = async () => {
+  const fetchPrices = useCallback(async () => {
+    try {
+      setError(null);
+      const newPrices: Prices = {};
+      
+      // Try cache first
       try {
-        setLoading(true);
-        const newPrices: Prices = {};
-
-        const uniqueSymbols = Array.from(
-          new Set(aggregatedAssets.map((asset) => asset.symbol))
-        );
-
-        const requests = uniqueSymbols.map(async (symbol) => {
-          // Use the symbolData mapping to get the correct cryptoId
-          const cryptoId = symbolData[symbol as keyof typeof symbolData]?.name;
-
-          if (!cryptoId) {
-            console.error(`No mapping found for symbol: ${symbol}`);
-            newPrices[symbol] = null;
-            return;
-          }
-
-          try {
-            const response = await axios.get(
-              `http://localhost:8080/api/crypto/prices`,
-              {
-                params: {
-                  ids: cryptoId.toLowerCase(),
-                  vs_currencies: "inr",
-                },
-                withCredentials: true,
-              }
-            );
-            newPrices[symbol] =
-              response.data?.[cryptoId.toLowerCase()]?.inr || null;
-          } catch (err) {
-            console.error(`Error fetching price for ${symbol}:`, err);
-            newPrices[symbol] = null;
-          }
-        });
-
-        // Wait for all requests to complete
-        await Promise.all(requests);
-
-        setPrices(newPrices);
-        console.log("Fetched Prices:", newPrices);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching prices:", err);
-        setError("Failed to fetch prices");
-      } finally {
-        setLoading(false);
+        const cachedPrices = localStorage.getItem('cryptoPrices');
+        if (cachedPrices) {
+          Object.assign(newPrices, JSON.parse(cachedPrices));
+        }
+      } catch (cacheError) {
+        console.warn("Failed to read price cache", cacheError);
       }
-    };
 
-    if (aggregatedAssets.length > 0) {
-      fetchPrices();
-    } else {
-      setLoading(false);
+      // Fetch fresh prices
+      const uniqueSymbols = Array.from(
+        new Set(aggregatedAssets.map((asset) => asset.symbol))
+      );
+
+      await Promise.all(uniqueSymbols.map(async (symbol) => {
+        const cryptoId = symbolData[symbol as keyof typeof symbolData]?.name;
+        if (!cryptoId) {
+          console.warn(`No mapping found for symbol: ${symbol}`);
+          newPrices[symbol] = newPrices[symbol] || null;
+          return;
+        }
+
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/api/crypto/prices`,
+            {
+              params: {
+                ids: cryptoId.toLowerCase(),
+                vs_currencies: "inr",
+              },
+              withCredentials: true,
+              timeout: 5000 // 5 second timeout
+            }
+          );
+          newPrices[symbol] = response.data?.[cryptoId.toLowerCase()]?.inr || null;
+        } catch (apiError) {
+          console.warn(`Failed to fetch price for ${symbol}:`, apiError);
+          newPrices[symbol] = newPrices[symbol] || null;
+        }
+      }));
+
+      // Update state and cache
+      setPrices(newPrices);
+      localStorage.setItem('cryptoPrices', JSON.stringify(newPrices));
+      setDataAvailable(prev => ({...prev, prices: true}));
+    } catch (err) {
+      console.error("Price fetch error:", err);
+      setError("Failed to update some prices");
+      setDataAvailable(prev => ({...prev, prices: false}));
     }
   }, [aggregatedAssets]);
 
-  // Calculate metrics when prices or assets change
+  // Fetch prices when assets change
   useEffect(() => {
-    if (!loading && Object.keys(prices).length > 0) {
+    if (dataAvailable.transactions && aggregatedAssets.length > 0) {
+      fetchPrices();
+    }
+  }, [aggregatedAssets, dataAvailable.transactions, fetchPrices]);
+
+  // Calculate metrics
+  useEffect(() => {
+    if (dataAvailable.transactions) {
       const totalInvested = aggregatedAssets.reduce(
-        (sum, asset) =>
-          sum + asset.avgBuyPrice * asset.totalQuantity + asset.totalFee,
+        (sum, asset) => sum + asset.avgBuyPrice * asset.totalQuantity + asset.totalFee,
         0
       );
 
       const totalCurrent = aggregatedAssets.reduce(
-        (sum, asset) => sum + (prices[asset.symbol] || 0) * asset.totalQuantity,
+        (sum, asset) => sum + (prices[asset.symbol] || asset.avgBuyPrice) * asset.totalQuantity,
         0
       );
 
       const totalReturn = totalCurrent - totalInvested;
-      const totalReturnPercentage =
-        totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0;
+      const totalReturnPercentage = totalInvested > 0 ? 
+        (totalReturn / totalInvested) * 100 : 0;
 
-      // Update metrics
       setMetrics({
         totalBalance: totalCurrent,
-        totalInvested: totalInvested,
-        totalReturn: totalReturn,
-        totalReturnPercentage: totalReturnPercentage,
+        totalInvested,
+        totalReturn,
+        totalReturnPercentage
       });
     }
-  }, [prices, loading, aggregatedAssets]);
+  }, [prices, aggregatedAssets, dataAvailable.transactions]);
+
+  const loading = useMemo(() => {
+    return !dataAvailable.transactions || 
+           (aggregatedAssets.length > 0 && !dataAvailable.prices);
+  }, [dataAvailable, aggregatedAssets]);
+
+  const contextValue = useMemo(() => ({
+    transactions,
+    setTransactions,
+    aggregatedAssets,
+    prices,
+    loading,
+    error,
+    metrics,
+    dateRange,
+    setDateRange,
+    formatCurrency,
+    getMetricChange,
+    dataAvailable
+  }), [
+    transactions,
+    aggregatedAssets,
+    prices,
+    loading,
+    error,
+    metrics,
+    dateRange,
+    formatCurrency,
+    getMetricChange,
+    dataAvailable
+  ]);
 
   return (
-    <VaultContext.Provider
-      value={{
-        transactions,
-        setTransactions,
-        aggregatedAssets,
-        prices,
-        loading,
-        error,
-        metrics,
-        dateRange,
-        setDateRange,
-        formatCurrency,
-        getMetricChange,
-      }}
-    >
+    <VaultContext.Provider value={contextValue}>
       {children}
     </VaultContext.Provider>
   );

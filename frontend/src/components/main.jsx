@@ -1,4 +1,7 @@
+"use client";
 import React from "react";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import Link from "next/link";
 
 const Main = () => {
   return (
@@ -39,7 +42,17 @@ const Main = () => {
         <p className="mb-6 text-sm font-light tracking-wide text-gray-300 sm:text-base">
           Manage all your portfolio at same place.
         </p>
-
+        <div className=" flex justify-center text-center">
+          <Link href={"/dashboard"} type="button">
+            <HoverBorderGradient
+              containerClassName="rounded-full"
+              as="button"
+              className="dark:bg-black dark:text-white flex items-center space-x-2"
+            >
+              <span>Try Now</span>
+            </HoverBorderGradient>
+          </Link>
+        </div>
       </div>
     </div>
   );

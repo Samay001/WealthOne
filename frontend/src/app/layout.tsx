@@ -4,6 +4,8 @@ import "./globals.css";
 import "./charts.css";
 import { AuthProvider } from "./context/AuthContext";
 import { StockProvider } from "./context/stockContext";
+import { PortfolioProvider } from "./context/dashboardContext";
+
 import ChatBot from "@/components/chatbot";
 
 const geistSans = Geist({
@@ -33,8 +35,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <StockProvider>
-            {children}
-            <ChatBot />
+            <PortfolioProvider>
+              {children}
+              <ChatBot />
+            </PortfolioProvider>
           </StockProvider>
         </AuthProvider>
       </body>
