@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode, useCallback } from 'react';
 import axios from 'axios';
 import symbolData from '@/data/sample/crypto-mapping.json';
