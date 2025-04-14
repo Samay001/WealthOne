@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MetricsCard } from "@/components/metrics-card";
-import { PieComponent } from "@/components/pie-chart";
-import { LineComponent } from "@/components/line-chart";
+// import { PieComponent } from "@/components/pie-chart";
+// import { LineComponent } from "@/components/line-chart";
 import CryptoDashboard from "@/app/crypto/page";
 import StockDashboard from "@/app/stocks/page";
 import Link from "next/link";
@@ -178,7 +178,7 @@ export default function Dashboard() {
 
             {/* Charts Section */}
             <div className="chart-theme flex flex-col md:flex-row gap-4 w-full">
-              <div className="md:w-1/3 min-h-[100px]">
+              {/* <div className="md:w-1/3 min-h-[100px]">
                 {loading ? (
                   <Skeleton className="h-64 rounded-lg bg-white/10" />
                 ) : (
@@ -196,7 +196,7 @@ export default function Dashboard() {
                     )}
                   </div>
                 )}
-              </div>
+              </div> */}
               <div className="md:w-2/3 min-h-[300px]">
                 {loading ? (
                   <Skeleton className="h-64 rounded-lg bg-white/10" />
