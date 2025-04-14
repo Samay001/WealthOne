@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (username: string, password: string) => {
-    const res = await fetch("http://localhost:8080/auth/v1/login", {
+    const res = await fetch("https://wealthone.onrender.com/auth/v1/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (username: string, email: string, password: string) => {
-    const res = await fetch("http://localhost:8080/auth/v1/register", {
+    const res = await fetch("https://wealthone.onrender.com/auth/v1/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),

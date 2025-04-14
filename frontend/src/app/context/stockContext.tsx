@@ -94,7 +94,7 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
         uniqueSymbols.map(async (symbol) => {
           try {
             const response = await axios.get(
-              "http://localhost:8080/api/stock/price",
+              "https://wealthone.onrender.com/api/stock/price",
               {
                 params: { name: symbol },
                 withCredentials: true,

@@ -227,7 +227,7 @@ export const VaultProvider = ({ children }: { children: ReactNode }) => {
 
         try {
           const response = await axios.get(
-            `http://localhost:8080/api/crypto/prices`,
+            `https://wealthone.onrender.com/api/crypto/prices`,
             {
               params: {
                 ids: cryptoId.toLowerCase(),
