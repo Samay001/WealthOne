@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import symbolData from "@/data/sample/crypto-mapping.json";
 import { useVault } from "@/app/context/cryptoContext";
+import Image from "next/image";
 
 export function VaultTable() {
   const { aggregatedAssets, prices, loading, error } = useVault();
@@ -59,7 +60,7 @@ export function VaultTable() {
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <img
+                    <Image
                       src={
                         (symbolData as Record<string, { name: string; svg_url: string }>)[asset.symbol]?.svg_url || "/placeholder.png"
                       }

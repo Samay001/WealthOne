@@ -2,6 +2,7 @@
 import React from "react";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import Link from "next/link";
+import Image from "next/image";
 
 const Main = () => {
   return (
@@ -9,7 +10,7 @@ const Main = () => {
       data-framer-background-image-wrapper="true"
       className="absolute inset-0 rounded-inherit scroll-smooth "
     >
-      <img
+      <Image
         decoding="async"
         sizes="100vw"
         srcSet="

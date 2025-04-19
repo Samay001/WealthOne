@@ -89,7 +89,7 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       
-      const response = await fetch(`http://localhost:8080/api/v1/stock?name=${symbol}`);
+      const response = await fetch(`https://wealthone.onrender.com/api/v1/stock?name=${symbol}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch stock price: ${response.statusText}`);

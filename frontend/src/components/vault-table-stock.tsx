@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useStocks } from "@/app/context/stockContext";
+import Image from "next/image";
 
 interface VaultTableProps {
   refreshStockPrice?: (symbol: string) => Promise<void>;
@@ -116,7 +117,7 @@ export function VaultTable({ refreshStockPrice, refreshing }: VaultTableProps) {
                   >
                     <TableCell className="font-medium text-white flex items-center gap-2">
                       {stock.logo_svg_url && (
-                        <img
+                        <Image
                           src={stock.logo_svg_url}
                           alt={stock.company_name}
                           className="h-6 w-6 rounded"
