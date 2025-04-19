@@ -1,86 +1,89 @@
 "use client";
-import React, { useState,useEffect} from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MetricsCard } from "@/components/metrics-card";
-// import { PieComponent } from "@/components/pie-chart";
-// import { LineComponent } from "@/components/line-chart";
 import CryptoDashboard from "@/app/crypto/page";
 import StockDashboard from "@/app/stocks/page";
 import Link from "next/link";
-import { useAuth } from "../context/AuthContext";
 import {
   BarChart3,
   Globe,
-  Home,
   LayoutDashboard,
   Wallet,
   Menu,
   X,
-  RefreshCcw,
 } from "lucide-react";
-import { usePortfolio } from "@/app/context/dashboardContext";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
   
-  const { 
-    metrics, 
-    loading, 
-    error, 
-    getFormattedMetrics,
-    refreshData,
-    formatCurrency
-  } = usePortfolio();
+  // Hardcoded username
+  const username = "John Doe";
   
-  const formattedMetrics = getFormattedMetrics();
-  const { auth } = useAuth();
+  // Hardcoded metrics data
+  const hardcodedMetrics = {
+    totalBalance: "₹1,250,000.00",
+    totalInvestment: "₹1,000,000.00",
+    totalPnl: "₹250,000.00",
+    totalPnlPercentage: "+25.00%",
+    
+    stocksBalance: "₹750,000.00",
+    stocksInvestment: "₹600,000.00",
+    stocksPnl: "₹150,000.00",
+    stocksPnlPercentage: "+25.00%",
+    
+    cryptoBalance: "₹500,000.00",
+    cryptoInvestment: "₹400,000.00",
+    cryptoPnl: "₹100,000.00",
+    cryptoPnlPercentage: "+25.00%",
+  };
+  
+  // Hardcoded top holdings
+  const topHoldings = [
+    { name: "AAPL", type: "stock", price: 175.25, value: 175250, pnl: 45250, pnlPercentage: 34.8 },
+    { name: "MSFT", type: "stock", price: 350.45, value: 140180, pnl: 30180, pnlPercentage: 27.4 },
+    { name: "BTC", type: "crypto", price: 65000, value: 130000, pnl: 50000, pnlPercentage: 62.5 },
+    { name: "AMZN", type: "stock", price: 178.30, value: 89150, pnl: 19150, pnlPercentage: 27.4 },
+    { name: "ETH", type: "crypto", price: 3400, value: 68000, pnl: 18000, pnlPercentage: 36.0 }
+  ];
+  
+  // Hardcoded loading state
+  const loading = false;
+  
+  // Format currency function
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const getCurrentDateRange = () => {
-    const today = new Date();
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(today.getDate() - 5);
-    return `${format(fiveDaysAgo, 'MMM dd, yyyy')} - ${format(today, 'MMM dd, yyyy')}`;
-  };
-
-  useEffect(() => { 
-        if (auth && auth.user) {
-          setUsername(auth.user.username);
-        }
-      }
-      , [auth]);
-  
   const renderContent = () => {
     switch (currentPage) {
       case "dashboard":
         return (
           <main className="p-6 bg-black text-white w-full min-h-screen">
             <div className="mb-6 flex items-center justify-between">
-            <div>
-              <div className="space-y-1 mb-2">
-                <h1 className="text-2xl font-bold text-white">Overview</h1>
-              </div>
-              <div className="text-sm text-white/50">
+              <div>
+                <div className="space-y-1 mb-2">
+                  <h1 className="text-2xl font-bold text-white">Overview</h1>
+                </div>
+                <div className="text-sm text-white/50">
                   {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </div>
+              </div>
+              <div>
+                <h2>{username}</h2>
               </div>
             </div>
-            <div>
-              <h2>{username}</h2>
-          </div>
-          </div>
-
-            {error && (
-              <div className="p-4 mb-6 bg-red-900/20 border border-red-600 rounded-lg">
-                <p className="text-red-300">Error: {error}</p>
-              </div>
-            )}
 
             {/* Metrics Cards Section */}
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -94,16 +97,16 @@ export default function Dashboard() {
                 <>
                   <MetricsCard
                     title="Your Balance"
-                    value={formattedMetrics.totalBalance}
+                    value={hardcodedMetrics.totalBalance}
                     change={{
-                      value: formattedMetrics.totalPnl,
-                      percentage: formattedMetrics.totalPnlPercentage,
-                      isPositive: metrics.totalPnl >= 0,
+                      value: hardcodedMetrics.totalPnl,
+                      percentage: hardcodedMetrics.totalPnlPercentage,
+                      isPositive: true,
                     }}
                   />
                   <MetricsCard
                     title="Your Investments"
-                    value={formattedMetrics.totalInvestment}
+                    value={hardcodedMetrics.totalInvestment}
                     change={{
                       value: "",
                       percentage: "",
@@ -112,11 +115,11 @@ export default function Dashboard() {
                   />
                   <MetricsCard
                     title="Total Returns"
-                    value={formattedMetrics.totalPnl}
+                    value={hardcodedMetrics.totalPnl}
                     change={{
                       value: "",
-                      percentage: formattedMetrics.totalPnlPercentage,
-                      isPositive: metrics.totalPnl >= 0,
+                      percentage: hardcodedMetrics.totalPnlPercentage,
+                      isPositive: true,
                     }}
                   />
                 </>
@@ -137,42 +140,36 @@ export default function Dashboard() {
                     <h3 className="text-lg font-medium mb-2">Stocks</h3>
                     <div className="flex justify-between mb-1">
                       <span>Value:</span>
-                      <span>{formattedMetrics.stocksBalance}</span>
+                      <span>{hardcodedMetrics.stocksBalance}</span>
                     </div>
                     <div className="flex justify-between mb-1">
                       <span>Investment:</span>
-                      <span>{formattedMetrics.stocksInvestment}</span>
+                      <span>{hardcodedMetrics.stocksInvestment}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Return:</span>
-                      <span className={metrics.stocksPnl >= 0 ? "text-green-500" : "text-red-500"}>
-                        {formattedMetrics.stocksPnl} ({formattedMetrics.stocksPnlPercentage})
+                      <span className="text-green-500">
+                        {hardcodedMetrics.stocksPnl} ({hardcodedMetrics.stocksPnlPercentage})
                       </span>
                     </div>
                   </div>
                   
                   <div className="bg-white/5 p-4 rounded-lg">
                     <h3 className="text-lg font-medium mb-2">Crypto</h3>
-                    {metrics.dataAvailable.crypto ? (
-                      <>
-                        <div className="flex justify-between mb-1">
-                          <span>Value:</span>
-                          <span>{formattedMetrics.cryptoBalance}</span>
-                        </div>
-                        <div className="flex justify-between mb-1">
-                          <span>Investment:</span>
-                          <span>{formattedMetrics.cryptoInvestment}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Return:</span>
-                          <span className={metrics.cryptoPnl >= 0 ? "text-green-500" : "text-red-500"}>
-                            {formattedMetrics.cryptoPnl} ({formattedMetrics.cryptoPnlPercentage})
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <p className="text-white/50">No crypto data available</p>
-                    )}
+                    <div className="flex justify-between mb-1">
+                      <span>Value:</span>
+                      <span>{hardcodedMetrics.cryptoBalance}</span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span>Investment:</span>
+                      <span>{hardcodedMetrics.cryptoInvestment}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Return:</span>
+                      <span className="text-green-500">
+                        {hardcodedMetrics.cryptoPnl} ({hardcodedMetrics.cryptoPnlPercentage})
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -180,61 +177,38 @@ export default function Dashboard() {
 
             {/* Charts Section */}
             <div className="chart-theme flex flex-col md:flex-row gap-4 w-full">
-              {/* <div className="md:w-1/3 min-h-[100px]">
-                {loading ? (
-                  <Skeleton className="h-64 rounded-lg bg-white/10" />
-                ) : (
-                  <div className="bg-white/5 p-4 rounded-lg h-full">
-                    <h3 className="text-lg font-medium mb-4">Asset Allocation</h3>
-                    {metrics.assetAllocation.length > 0 ? (
-                      <PieComponent 
-                        data={metrics.assetAllocation.map(asset => ({
-                          name: asset.type.charAt(0).toUpperCase() + asset.type.slice(1),
-                          value: asset.value
-                        }))}
-                      />
-                    ) : (
-                      <p className="text-white/50">No allocation data available</p>
-                    )}
-                  </div>
-                )}
-              </div> */}
-              <div className="md:w-2/3 min-h-[300px]">
+              <div className="w-full min-h-[300px]">
                 {loading ? (
                   <Skeleton className="h-64 rounded-lg bg-white/10" />
                 ) : (
                   <div className="bg-white/5 p-4 rounded-lg h-full">
                     <h3 className="text-lg font-medium mb-4">Top Holdings</h3>
-                    {metrics.topHoldings.length > 0 ? (
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr>
-                              <th className="text-left pb-2">Asset</th>
-                              <th className="text-right pb-2">Type</th>
-                              <th className="text-right pb-2">Price</th>
-                              <th className="text-right pb-2">Value</th>
-                              <th className="text-right pb-2">Return</th>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="text-left pb-2">Asset</th>
+                            <th className="text-right pb-2">Type</th>
+                            <th className="text-right pb-2">Price</th>
+                            <th className="text-right pb-2">Value</th>
+                            <th className="text-right pb-2">Return</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {topHoldings.map((holding, index) => (
+                            <tr key={index} className="border-t border-white/10">
+                              <td className="py-2">{holding.name}</td>
+                              <td className="text-right py-2 capitalize">{holding.type}</td>
+                              <td className="text-right py-2">{formatCurrency(holding.price)}</td>
+                              <td className="text-right py-2">{formatCurrency(holding.value)}</td>
+                              <td className={`text-right py-2 ${holding.pnl >= 0 ? "text-green-500" : "text-red-500"}`}>
+                                {formatCurrency(holding.pnl)} ({holding.pnlPercentage.toFixed(2)}%)
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            {metrics.topHoldings.slice(0, 5).map((holding, index) => (
-                              <tr key={index} className="border-t border-white/10">
-                                <td className="py-2">{holding.name}</td>
-                                <td className="text-right py-2 capitalize">{holding.type}</td>
-                                <td className="text-right py-2">{formatCurrency(holding.price)}</td>
-                                <td className="text-right py-2">{formatCurrency(holding.value)}</td>
-                                <td className={`text-right py-2 ${holding.pnl >= 0 ? "text-green-500" : "text-red-500"}`}>
-                                  {formatCurrency(holding.pnl)} ({holding.pnlPercentage.toFixed(2)}%)
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <p className="text-white/50">No holdings data available</p>
-                    )}
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </div>
