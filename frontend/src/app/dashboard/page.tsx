@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect} from "react";
 import { Button } from "@/components/ui/button";
 import { MetricsCard } from "@/components/metrics-card";
 // import { PieComponent } from "@/components/pie-chart";
@@ -7,6 +7,7 @@ import { MetricsCard } from "@/components/metrics-card";
 import CryptoDashboard from "@/app/crypto/page";
 import StockDashboard from "@/app/stocks/page";
 import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
 import {
   BarChart3,
   Globe,
@@ -24,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   
   const { 
     metrics, 
@@ -35,7 +37,8 @@ export default function Dashboard() {
   } = usePortfolio();
   
   const formattedMetrics = getFormattedMetrics();
-
+  const { auth } = useAuth();
+  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -47,32 +50,31 @@ export default function Dashboard() {
     return `${format(fiveDaysAgo, 'MMM dd, yyyy')} - ${format(today, 'MMM dd, yyyy')}`;
   };
 
+  useEffect(() => { 
+        if (auth && auth.user) {
+          setUsername(auth.user.username);
+        }
+      }
+      , [auth]);
+  
   const renderContent = () => {
     switch (currentPage) {
       case "dashboard":
         return (
           <main className="p-6 bg-black text-white w-full min-h-screen">
-            <div className="mb-8 flex items-center justify-between">
-              <div className="space-y-1">
+            <div className="mb-6 flex items-center justify-between">
+            <div>
+              <div className="space-y-1 mb-2">
                 <h1 className="text-2xl font-bold text-white">Overview</h1>
-                <div className="text-sm text-white/50">
-                  {getCurrentDateRange()}
-                </div>
               </div>
-              {/* <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={refreshData}
-                  disabled={loading}
-                  className="text-white border-white/20 hover:bg-white/10"
-                >
-                  <RefreshCcw className="h-4 w-4 mr-2" />
-                  Refresh
-                </Button>
-                <h1 className="text-xl font-bold text-white">deep3</h1>
-              </div> */}
+              <div className="text-sm text-white/50">
+                  {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </div>
             </div>
+            <div>
+              <h2>{username}</h2>
+          </div>
+          </div>
 
             {error && (
               <div className="p-4 mb-6 bg-red-900/20 border border-red-600 rounded-lg">

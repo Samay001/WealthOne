@@ -95,30 +95,7 @@
       "exchange": "NSE",
       "logo_svg_url": "https://logowik.com/content/uploads/images/tcs-tata-consultancy-services2792.logowik.com.webp",
       "position": "EQUITY"
-    },
-    {
-      "isin": "INE062A01020",
-      "cnc_used_quantity": 0,
-      "collateral_type": "WC",
-      "company_name": "STATE BANK OF INDIA",
-      "haircut": 0.2,
-      "product": "D",
-      "quantity": 20,
-      "trading_symbol": "SBIN",
-      "tradingsymbol": "SBIN",
-      "last_price": 450.0,
-      "close_price": 445.0,
-      "pnl": 100.0,
-      "day_change": 5.0,
-      "day_change_percentage": 1.12,
-      "instrument_token": "NSE_EQ|INE062A01020",
-      "average_price": 440.0,
-      "collateral_quantity": 0,
-      "collateral_update_quantity": 0,
-      "t1_quantity": 0,
-      "exchange": "NSE",
-      "logo_svg_url": "https://cdn.worldvectorlogo.com/logos/sbi-state-bank-of-india.svg",
-      "position": "EQUITY"
     }
+
   ]
 }

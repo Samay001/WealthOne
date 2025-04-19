@@ -1,170 +1,192 @@
-'use client';
+// components/vault-table-stock.tsx
+"use client";
 
-import React, { useEffect } from 'react';
-import { Avatar } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { useStocks } from "@/app/context/stockContext";
-import data from "@/data/sample/stock.json";
 
-// Define types for the stock data
-interface StockData {
-  isin: string;
-  cnc_used_quantity: number;
-  collateral_type: string;
-  company_name: string;
-  haircut: number;
-  product: string;
-  quantity: number;
-  trading_symbol: string;
-  tradingsymbol: string;
-  last_price: number;
-  close_price: number;
-  pnl: number;
-  day_change: number;
-  day_change_percentage: number;
-  instrument_token: string;
-  average_price: number;
-  collateral_quantity: number;
-  collateral_update_quantity: number;
-  t1_quantity: number;
-  exchange: string;
-  logo_svg_url: string;
-  position: string;
-  current_price?: number;
-  investment?: string;
-  balance?: string;
-  pnl_string?: string;
-  percent_change?: string;
-  start_date?: string;
-  industry?: string | null;
+interface VaultTableProps {
+  refreshStockPrice?: (symbol: string) => Promise<void>;
+  refreshing?: string | null;
 }
 
-interface StockDataResponse {
-  data: StockData[];
-}
+export function VaultTable({ refreshStockPrice, refreshing }: VaultTableProps) {
+  const { stocks, formatCurrency } = useStocks();
+  const [activeExchange, setActiveExchange] = useState<string>("NSE");
+  const [refreshingStock, setRefreshingStock] = useState<string | null>(null);
 
-export function VaultTable() {
-  const { stocks, loading, error, updateStockData, formatCurrency } = useStocks();
-  const initialVaults: StockData[] = (data as StockDataResponse).data;
+  // Filter stocks by active exchange
+  const filteredStocks = stocks.filter(
+    (stock) => stock.exchange === activeExchange
+  );
 
-  // When component mounts, update stock data with latest prices
-  useEffect(() => {
-    updateStockData(initialVaults);
-    
-    // Set up polling to refresh data periodically
-    const intervalId = setInterval(() => {
-      updateStockData(initialVaults);
-    }, 60000); // Update every minute
-    
-    return () => clearInterval(intervalId);
-  }, [updateStockData]);
+  // Handle refresh for individual stock
+  const handleRefresh = async (symbol: string) => {
+    if (!refreshStockPrice) return;
 
-  if (loading && stocks.length === 0) {
-    return <div className="p-4 text-center">Loading stock data...</div>;
-  }
+    setRefreshingStock(symbol);
+    try {
+      await refreshStockPrice(symbol);
+    } finally {
+      setRefreshingStock(null);
+    }
+  };
 
-  if (error && stocks.length === 0) {
-    return <div className="p-4 text-center text-red-500">{error}</div>;
-  }
+  // Calculate profit/loss for stock
+  const calculateStockPnL = (stock: any) => {
+    const currentPrice = stock.current_price || stock.last_price;
+    const currentValue = currentPrice * stock.quantity;
+    const investment = stock.average_price * stock.quantity;
+    return currentValue - investment;
+  };
 
-  // Use stocks from context if available, otherwise use initial data
-  const vaults = stocks.length > 0 ? stocks : initialVaults;
+  // Calculate profit/loss percentage for stock
+  const calculateStockPnLPercentage = (stock: any) => {
+    const currentPrice = stock.current_price || stock.last_price;
+    const investment = stock.average_price;
+    if (investment === 0) return 0;
+    return ((currentPrice - investment) / investment) * 100;
+  };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="hover:bg-black border-white/30">
-          <TableHead className="text-gray-400 font-bold">Stock</TableHead>
-          <TableHead className="text-gray-400 font-bold">Position</TableHead>
-          <TableHead className="text-gray-400 font-bold">Your Price (₹)</TableHead>
-          <TableHead className="text-gray-400 font-bold">Current Price (₹)</TableHead>
-          <TableHead className="text-gray-400 font-bold">Quantity</TableHead>
-          <TableHead className="text-gray-400 font-bold">Investment</TableHead>
-          <TableHead className="text-gray-400 font-bold">Current Value</TableHead>
-          <TableHead className="text-gray-400 font-bold">Start date</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {vaults.map((vault) => {
-          const currentPrice = vault.current_price || vault.last_price;
-          const investmentValue = vault.investment 
-            ? parseFloat(vault.investment.replace(/[₹,]/g, '')) 
-            : vault.average_price * vault.quantity;
-          const currentValue = currentPrice * vault.quantity;
-          const profitLoss = currentValue - investmentValue;
-          const profitLossPercentage = investmentValue > 0 
-            ? (profitLoss / investmentValue) * 100 
-            : parseFloat(vault.percent_change || '0');
-
-          return (
-            <TableRow key={vault.isin} className="hover:bg-[#131316] border-white/20">
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <img src={vault.logo_svg_url} alt={vault.company_name} />
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{vault.company_name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {vault.tradingsymbol}
-                    </div>
-                  </div>
-                </div>
-              </TableCell>
-              
-              <TableCell>
-                <span
-                  className={`inline-flex items-center rounded-full px-2 py-1 text-xs ${
-                    vault.position === "EQUITY" ? "bg-yellow-500/10 text-yellow-500" : "bg-green-500/10 text-green-500"
-                  }`}
-                >
-                  {vault.position}
-                </span>
-              </TableCell>
-              
-              <TableCell>
-                {formatCurrency ? formatCurrency(vault.average_price) : `₹${vault.average_price.toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                })}`}
-              </TableCell>
-              
-              <TableCell>
-                {formatCurrency ? formatCurrency(currentPrice) : `₹${currentPrice.toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                })}`}
-              </TableCell>
-              
-              <TableCell>
-                {vault.quantity.toLocaleString("en-IN")}
-              </TableCell>
-              
-              <TableCell>
-                {vault.investment || (formatCurrency ? formatCurrency(investmentValue) : `₹${investmentValue.toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                })}`)}
-              </TableCell>
-              
-              <TableCell>
-                <div>
-                  {vault.balance || (formatCurrency ? formatCurrency(currentValue) : `₹${currentValue.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                  })}`)}
-                </div>
-                <div
-                  className={`text-xs ${
-                    profitLossPercentage >= 0 ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {profitLossPercentage >= 0 ? "+" : ""}
-                  {profitLossPercentage.toFixed(2)}%
-                </div>
-              </TableCell>
-              
-              <TableCell>{vault.start_date}</TableCell>
+    <div className="rounded-xl border border-white/20 bg-[#09090B] p-6">
+      <div className="flex flex-col space-y-1.5 pb-4">
+        <h2 className="text-lg font-semibold text-white">Your Stocks</h2>
+        <p className="text-sm text-white/50">
+          Overview of your stock portfolio
+        </p>
+      </div>
+      {/* <div className="mb-4 flex gap-2">
+        <Button 
+          size="sm" 
+          variant={activeExchange === "NSE" ? "default" : "outline"}
+          onClick={() => setActiveExchange("NSE")}
+          className={activeExchange === "NSE" ? "bg-white text-black" : "text-white border-white/20"}
+        >
+          NSE
+        </Button>
+        <Button 
+          size="sm" 
+          variant={activeExchange === "BSE" ? "default" : "outline"}
+          onClick={() => setActiveExchange("BSE")}
+          className={activeExchange === "BSE" ? "bg-white text-black" : "text-white border-white/20"}
+        >
+          BSE
+        </Button>
+      </div> */}
+      <div className="relative w-full overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/20 hover:bg-white/5">
+              <TableHead className="text-white">Stock</TableHead>
+              <TableHead className="text-white">Quantity</TableHead>
+              <TableHead className="text-right text-white">
+                Avg. Price
+              </TableHead>
+              <TableHead className="text-right text-white">
+                Current Price
+              </TableHead>
+              <TableHead className="text-right text-white">
+                Investment
+              </TableHead>
+              <TableHead className="text-right text-white">P&L</TableHead>
+              <TableHead className="text-right text-white"></TableHead>
             </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredStocks.length > 0 ? (
+              filteredStocks.map((stock) => {
+                const currentPrice = stock.current_price || stock.last_price;
+                const pnl = calculateStockPnL(stock);
+                const pnlPercentage = calculateStockPnLPercentage(stock);
+                const isPnlPositive = pnl >= 0;
+
+                return (
+                  <TableRow
+                    key={stock.isin}
+                    className="border-white/20 hover:bg-white/5"
+                  >
+                    <TableCell className="font-medium text-white flex items-center gap-2">
+                      {stock.logo_svg_url && (
+                        <img
+                          src={stock.logo_svg_url}
+                          alt={stock.company_name}
+                          className="h-6 w-6 rounded"
+                        />
+                      )}
+                      <div>
+                        <div>{stock.trading_symbol}</div>
+                        <div className="text-xs text-white/50">
+                          {stock.company_name}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-white">
+                      {stock.quantity}
+                    </TableCell>
+                    <TableCell className="text-right text-white">
+                      {formatCurrency(stock.average_price)}
+                    </TableCell>
+                    <TableCell className="text-right text-white">
+                      {formatCurrency(currentPrice)}
+                    </TableCell>
+                    <TableCell className="text-right text-white">
+                      {formatCurrency(stock.average_price * stock.quantity)}
+                    </TableCell>
+                    <TableCell
+                      className={`text-right ${
+                        isPnlPositive ? "text-green-500" : "text-red-500"
+                      }`}
+                    >
+                      <div>{formatCurrency(pnl)}</div>
+                      <div className="text-xs">
+                        {isPnlPositive ? "+" : ""}
+                        {pnlPercentage.toFixed(2)}%
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {refreshStockPrice && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-white/70 hover:text-white hover:bg-white/10"
+                          onClick={() => handleRefresh(stock.trading_symbol)}
+                          disabled={
+                            refreshingStock === stock.trading_symbol ||
+                            refreshing === "all"
+                          }
+                        >
+                          {refreshingStock === stock.trading_symbol
+                            ? "Refreshing..."
+                            : "Refresh"}
+                        </Button>
+                      )}
+                    </TableCell>
+                    
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="h-24 text-center text-white/50"
+                >
+                  No stocks found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }

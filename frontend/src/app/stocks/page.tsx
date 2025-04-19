@@ -1,6 +1,7 @@
+// app/dashboard/stock/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MetricsCard } from "@/components/metrics-card";
@@ -8,43 +9,33 @@ import { StatsChart } from "@/components/stats-chart";
 import { VaultTable } from "@/components/vault-table-stock";
 import { useStocks } from "@/app/context/stockContext";
 import sampleStockData from "@/data/sample/stock.json";
-
-interface StockData {
-  isin: string;
-  cnc_used_quantity: number;
-  collateral_type: string;
-  company_name: string;
-  haircut: number;
-  product: string;
-  quantity: number;
-  trading_symbol: string;
-  tradingsymbol: string;
-  last_price: number;
-  close_price: number;
-  pnl: number;
-  day_change: number;
-  day_change_percentage: number;
-  instrument_token: string;
-  average_price: number;
-  collateral_quantity: number;
-  collateral_update_quantity: number;
-  t1_quantity: number;
-  exchange: string;
-  logo_svg_url: string;
-  position: string;
-}
+import { Stock } from "@/app/context/stockContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function StockDashboard() {
-  const { stocks, loading, error, updateStockData, formatCurrency } = useStocks();
+  const { 
+    stocks, 
+    loading, 
+    error, 
+    updateStockData, 
+    refreshStockPrice, 
+    formatCurrency 
+  } = useStocks();
+  
+  const [refreshing, setRefreshing] = useState<string | null>(null);
+  const { auth } = useAuth();
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-    const stockData = sampleStockData.data as StockData[];
+    const stockData = sampleStockData.data as Stock[];
     
+    // Initialize with data from JSON
     updateStockData(stockData);
     
+    // Update stock data every minute
     const intervalId = setInterval(() => {
       updateStockData(stockData);
-    }, 60000); // Update every minute
+    }, 60000);
     
     return () => clearInterval(intervalId);
   }, [updateStockData]);
@@ -58,9 +49,16 @@ export default function StockDashboard() {
       return sum + (currentPrice * stock.quantity);
     }, 0);
     
-    return formatCurrency ? formatCurrency(total) : `₹${total.toLocaleString('en-IN')}`;
+    return formatCurrency(total);
   };
-  
+
+    useEffect(() => { 
+      if (auth && auth.user) {
+        setUsername(auth.user.username);
+      }
+    }
+    , [auth]);
+
   // Calculate total investment
   const calculateTotalInvestment = () => {
     if (!stocks.length) return "₹0";
@@ -69,7 +67,7 @@ export default function StockDashboard() {
       return sum + (stock.average_price * stock.quantity);
     }, 0);
     
-    return formatCurrency ? formatCurrency(total) : `₹${total.toLocaleString('en-IN')}`;
+    return formatCurrency(total);
   };
   
   // Calculate total profit/loss
@@ -83,7 +81,7 @@ export default function StockDashboard() {
       return sum + (currentValue - investment);
     }, 0);
     
-    return formatCurrency ? formatCurrency(total) : `₹${total.toLocaleString('en-IN')}`;
+    return formatCurrency(total);
   };
   
   // Calculate PnL percentage
@@ -121,6 +119,20 @@ export default function StockDashboard() {
     return totalCurrent >= totalInvestment;
   };
 
+  // Function to refresh all stock prices
+  // const refreshAllStockPrices = async () => {
+  //   setRefreshing('all');
+    
+  //   try {
+  //     // Process stocks sequentially to avoid rate limiting
+  //     for (const stock of stocks) {
+  //       await refreshStockPrice(stock.trading_symbol);
+  //     }
+  //   } finally {
+  //     setRefreshing(null);
+  //   }
+  // };
+
   if (loading && stocks.length === 0) {
     return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading stock data...</div>;
   }
@@ -133,13 +145,18 @@ export default function StockDashboard() {
     <div className="min-h-screen bg-black text-white w-full">
       <div className="w-full">
         <main className="p-6 bg-black text-white w-full">
-          <div className="mb-6 flex items-center justify-between">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-white">Stocks Overview</h1>
+        <div className="mb-6 flex items-center justify-between">
+            <div>
+              <div className="space-y-1 mb-2">
+                <h1 className="text-2xl font-bold text-white">Stock Overview</h1>
+              </div>
               <div className="text-sm text-white/50">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </div>
             </div>
+            <div>
+              <h2>{username}</h2>
+          </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <MetricsCard
@@ -184,7 +201,7 @@ export default function StockDashboard() {
             <StatsChart />
           </Card>
           <div className="mt-6">
-            <VaultTable />
+            <VaultTable refreshStockPrice={refreshStockPrice} refreshing={refreshing} />
           </div>
         </main>
       </div>
