@@ -90,12 +90,13 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
       setLoading(true);
       
       const response = await fetch(`https://wealthone.onrender.com/api/v1/stock?name=${symbol}`);
-      
+      console.log('Response:', response);
       if (!response.ok) {
         throw new Error(`Failed to fetch stock price: ${response.statusText}`);
       }
       
       const data: CurrentPriceResponse = await response.json();
+      console.log('Data:', data);
       
       // Update the specific stock with current price data
       setStocks(prevStocks => 

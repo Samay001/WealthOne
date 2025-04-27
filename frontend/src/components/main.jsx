@@ -2,27 +2,20 @@
 import React from "react";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 
 const Main = () => {
   return (
     <div
       data-framer-background-image-wrapper="true"
-      className="absolute inset-0 rounded-inherit scroll-smooth "
+      className="absolute inset-0 z-0 bg-cover bg-center "
+      style={{
+        backgroundImage:
+          "url('https://framerusercontent.com/images/4VX0PEAzbHMFjS7HeLo6v4CcP0.png')",
+        filter: "brightness(0.95)",
+      }}
     >
-      <Image
-        decoding="async"
-        sizes="100vw"
-        srcSet="
-                https://framerusercontent.com/images/4VX0PEAzbHMFjS7HeLo6v4CcP0.png?scale-down-to=512 512w, 
-                https://framerusercontent.com/images/4VX0PEAzbHMFjS7HeLo6v4CcP0.png?scale-down-to=1024 1024w, 
-                https://framerusercontent.com/images/4VX0PEAzbHMFjS7HeLo6v4CcP0.png?scale-down-to=2048 2048w, 
-                https://framerusercontent.com/images/4VX0PEAzbHMEjS7Helo6v4CcP0.png 2880w
-            "
-        src="https://framerusercontent.com/images/4VX0PEAzbHMEjS7Helo6v4CcP0.png"
-        alt=""
-        className="block w-full h-full rounded-inherit object-cover object-center"
-      />
+      
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/3 w-60 h-60 md:w-80 md:h-80 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 opacity-20 blur-3xl z-10"></div>
 
       <div className="absolute top-[40%] sm:top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white max-w-4xl w-4/5 p-6 mt-4">

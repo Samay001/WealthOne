@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
-    domains: ['images.pexels.com','framerusercontent.com'],
+    domains: ['images.pexels.com','framerusercontent.com','upload.wikimedia.org','seeklogo.com','logowik.com'],
   }
 };
 

@@ -120,6 +120,8 @@ export function VaultTable({ refreshStockPrice, refreshing }: VaultTableProps) {
                         <Image
                           src={stock.logo_svg_url}
                           alt={stock.company_name}
+                          width={100}
+                          height={100}
                           className="h-6 w-6 rounded"
                         />
                       )}
