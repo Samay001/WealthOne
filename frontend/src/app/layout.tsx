@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./charts.css";
+import { CryptoProvider } from "@/app/context/cryptoContext";
+import { StockProvider } from "@/app/context/stockContext";
 import { AuthProvider } from "./context/AuthContext";
-import { StockProvider } from "./context/stockContext";
-// import { PortfolioProvider } from "./context/dashboardContext";
 
 import ChatBot from "@/components/chatbot";
 
@@ -34,12 +34,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <StockProvider>
-            {/* <PortfolioProvider> */}
-              {children}
-              <ChatBot />
-            {/* </PortfolioProvider> */}
-          </StockProvider>
+        <StockProvider>
+          <CryptoProvider>
+            {children}
+            <ChatBot />
+          </CryptoProvider>
+        </StockProvider>
         </AuthProvider>
       </body>
     </html>
