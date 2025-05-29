@@ -49,7 +49,7 @@ export const StockProvider = ({ children }) => {
     for (const stock of stockData) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/v1/stock?name=${stock.symbol.toLowerCase()}`
+          `https://wealth-one-nine.vercel.app/api/v1/stock?name=${stock.symbol.toLowerCase()}`
         );
         const nsePrice = parseFloat(response.data.currentPrice.NSE);
         if (!isNaN(nsePrice)) {
