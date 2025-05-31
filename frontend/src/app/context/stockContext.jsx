@@ -16,6 +16,20 @@ export const StockProvider = ({ children }) => {
   const [lastUpdated, setLastUpdated] = useState(null)
   const [dataTimestamp, setDataTimestamp] = useState(null)
 
+  // Helper function to fetch single stock price - eliminates code duplication
+  const fetchSingleStockPrice = useCallback(async (symbol) => {
+    const response = await axios.get(
+      `https://wealth-one-nine.vercel.app/api/v1/stock?name=${symbol.toLowerCase()}`
+    );
+    const nsePrice = parseFloat(response.data.currentPrice.NSE);
+    
+    if (isNaN(nsePrice)) {
+      throw new Error(`Invalid price data for ${symbol}`);
+    }
+    
+    return nsePrice;
+  }, []);
+
   // Calculate totals whenever CMP prices change
   useEffect(() => {
     let totalInvestment = 0;
@@ -48,15 +62,8 @@ export const StockProvider = ({ children }) => {
 
     for (const stock of stockData) {
       try {
-        const response = await axios.get(
-          `https://wealth-one-nine.vercel.app/api/v1/stock?name=${stock.symbol.toLowerCase()}`
-        );
-        const nsePrice = parseFloat(response.data.currentPrice.NSE);
-        if (!isNaN(nsePrice)) {
-          updatedPrices[stock.symbol] = nsePrice;
-        } else {
-          errors.push(`Invalid price data for ${stock.symbol}`);
-        }
+        const price = await fetchSingleStockPrice(stock.symbol);
+        updatedPrices[stock.symbol] = price;
       } catch (error) {
         console.error(`Failed to fetch CMP for ${stock.symbol}`, error);
         errors.push(`Failed to fetch ${stock.symbol}`);
@@ -73,29 +80,24 @@ export const StockProvider = ({ children }) => {
     }
 
     setLoading(false);
-  }, []);
+  }, [fetchSingleStockPrice]);
 
   // Fetch individual stock price
   const fetchStockPrice = useCallback(async (symbol) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/stock?name=${symbol.toLowerCase()}`
-      );
-      const nsePrice = parseFloat(response.data.currentPrice.NSE);
+      const price = await fetchSingleStockPrice(symbol);
       
-      if (!isNaN(nsePrice)) {
-        setCmpPrices(prev => ({
-          ...prev,
-          [symbol]: nsePrice
-        }));
-        return nsePrice;
-      }
-      throw new Error("Invalid price data");
+      setCmpPrices(prev => ({
+        ...prev,
+        [symbol]: price
+      }));
+      
+      return price;
     } catch (error) {
       console.error(`Failed to fetch CMP for ${symbol}`, error);
       throw error;
     }
-  }, []);
+  }, [fetchSingleStockPrice]);
 
   // Get all stock data with calculated values
   const getStockData = useCallback(() => {
