@@ -16,10 +16,9 @@ export const StockProvider = ({ children }) => {
   const [lastUpdated, setLastUpdated] = useState(null)
   const [dataTimestamp, setDataTimestamp] = useState(null)
 
-  // Helper function to fetch single stock price - eliminates code duplication
   const fetchSingleStockPrice = useCallback(async (symbol) => {
     const response = await axios.get(
-      `https://wealth-one-nine.vercel.app/api/v1/stock?name=${symbol.toLowerCase()}`
+      `https://wealthone.onrender.com/api/v1/stock?name=${symbol}`
     );
     const nsePrice = parseFloat(response.data.currentPrice.NSE);
     

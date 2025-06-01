@@ -66,7 +66,7 @@ export const CryptoProvider = ({ children }) => {
   // Fetch current market prices
   const fetchCmpData = useCallback(async () => {
     const symbols = cryptoData.map((crypto) => crypto.name).join(",");
-    const url = `http://wealth-one-nine.vercel.app/api/crypto/prices?ids=${symbols}&vs_currencies=inr`;
+    const url = `https://wealthone.onrender.com/api/crypto/prices?ids=${symbols}&vs_currencies=inr`;
 
     setIsLoading(true);
     setError(null);

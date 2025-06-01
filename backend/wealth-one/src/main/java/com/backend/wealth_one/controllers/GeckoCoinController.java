@@ -1,6 +1,7 @@
 package com.backend.wealth_one.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -18,13 +19,19 @@ public class GeckoCoinController {
     private final String geckoBaseUrl = "https://api.coingecko.com/api/v3";
     private final RestTemplate restTemplate;
 
-    public GeckoCoinController() {
-        this.restTemplate = new RestTemplate();
+    // Use constructor injection for better testability
+    public GeckoCoinController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> callGeckoApi(HttpMethod method, String endpoint, Map<String, String> params) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(geckoBaseUrl + endpoint)
-                .queryParam("x_cg_demo_api_key", geckoApiKey);
+    // Spring-managed bean for RestTemplate (you can put this in a config class too)
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    private Map<String, Object> callGeckoApi(HttpMethod method, String endpoint, Map<String, String> params) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(geckoBaseUrl + endpoint);
 
         if (params != null && !params.isEmpty()) {
             params.forEach(uriBuilder::queryParam);
@@ -32,6 +39,7 @@ public class GeckoCoinController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
+        headers.set("x-cg-demo-api-key", geckoApiKey); // Proper header key as per CoinGecko docs
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
@@ -49,7 +57,7 @@ public class GeckoCoinController {
 
     @GetMapping("/prices")
     public Map<String, Object> getCryptoPrices(
-            @RequestParam(defaultValue = "Solana") String ids,
+            @RequestParam(defaultValue = "solana") String ids,
             @RequestParam(defaultValue = "inr") String vsCurrencies) {
 
         Map<String, String> params = new HashMap<>();
@@ -63,5 +71,4 @@ public class GeckoCoinController {
     public Map<String, Object> getTrendingCoins() {
         return callGeckoApi(HttpMethod.GET, "/search/trending", null);
     }
-
 }
