@@ -25,6 +25,8 @@ export default function RegisterPage() {
           src="https://images.pexels.com/photos/7682111/pexels-photo-7682111.jpeg?auto=compress&cs=tinysrgb&w=600"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          width={600}
+          height={600}
         />
       </div>
     </div>

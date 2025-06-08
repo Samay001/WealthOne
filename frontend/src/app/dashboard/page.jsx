@@ -155,7 +155,7 @@ const UnifiedDashboard = ({
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
-          <p className="text-xl text-gray-300">Loading portfolio data...</p>
+          <p className="text-xl text-gray-300">Server is on Render, Might take upto a minute or two</p>
         </div>
       </div>
     );

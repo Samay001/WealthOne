@@ -1,7 +1,6 @@
 package com.backend.wealth_one.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -19,15 +18,9 @@ public class GeckoCoinController {
     private final String geckoBaseUrl = "https://api.coingecko.com/api/v3";
     private final RestTemplate restTemplate;
 
-    // Use constructor injection for better testability
+    // Constructor injection for RestTemplate
     public GeckoCoinController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-    }
-
-    // Spring-managed bean for RestTemplate (you can put this in a config class too)
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 
     private Map<String, Object> callGeckoApi(HttpMethod method, String endpoint, Map<String, String> params) {
@@ -39,7 +32,7 @@ public class GeckoCoinController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
-        headers.set("x-cg-demo-api-key", geckoApiKey); // Proper header key as per CoinGecko docs
+        headers.set("x-cg-demo-api-key", geckoApiKey);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 

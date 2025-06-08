@@ -15,13 +15,19 @@ interface LoginFormProps extends React.ComponentProps<"form"> {
 export function LoginForm({ type, className, ...props }: LoginFormProps) {
   const isLogin = type === "login";
   const router = useRouter();
-  
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [upstoxApiKey, setUpstoxApiKey] = useState("");
+  const [upstoxApiSecret, setUpstoxApiSecret] = useState("");
+  const [coindcxApiKey, setCoindcxApiKey] = useState("");
+  const [coindcxApiSecret, setCoindcxApiSecret] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { login, register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +40,15 @@ export function LoginForm({ type, className, ...props }: LoginFormProps) {
         await login(username, password);
         router.push("/");
       } else {
-        await register(username, email, password);
+        await register({
+          username,
+          email,
+          password,
+          upstoxApiKey,
+          upstoxApiSecret,
+          coindcxApiKey,
+          coindcxApiSecret,
+        });
         router.push("/login");
       }
     } catch (error: any) {
@@ -74,20 +88,76 @@ export function LoginForm({ type, className, ...props }: LoginFormProps) {
             disabled={isLoading}
           />
         </div>
+
         {!isLogin && (
-          <div className="grid gap-3">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
+          <>
+            <div className="grid gap-3">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="grid gap-3">
+              <Label htmlFor="upstoxApiKey">Upstox API Key</Label>
+              <Input
+                id="upstoxApiKey"
+                type="text"
+                placeholder="Enter Upstox API Key"
+                required
+                value={upstoxApiKey}
+                onChange={(e) => setUpstoxApiKey(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="grid gap-3">
+              <Label htmlFor="upstoxSecretKey">Upstox Secret Key</Label>
+              <Input
+                id="upstoxSecretKey"
+                type="password"
+                placeholder="Enter Upstox Secret Key"
+                required
+                value={upstoxApiSecret}
+                onChange={(e) => setUpstoxApiSecret(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="grid gap-3">
+              <Label htmlFor="coindcxApiKey">CoinDCX API Key</Label>
+              <Input
+                id="coindcxApiKey"
+                type="text"
+                placeholder="Enter CoinDCX API Key"
+                required
+                value={coindcxApiKey}
+                onChange={(e) => setCoindcxApiKey(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="grid gap-3">
+              <Label htmlFor="coindcxSecretKey">CoinDCX Secret Key</Label>
+              <Input
+                id="coindcxSecretKey"
+                type="password"
+                placeholder="Enter CoinDCX Secret Key"
+                required
+                value={coindcxApiSecret}
+                onChange={(e) => setCoindcxApiSecret(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          </>
         )}
+
         <div className="grid gap-3">
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
@@ -106,13 +176,11 @@ export function LoginForm({ type, className, ...props }: LoginFormProps) {
             disabled={isLoading}
           />
         </div>
+
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            "Processing..."
-          ) : (
-            isLogin ? "Login" : "Sign Up"
-          )}
+          {isLoading ? "Processing..." : isLogin ? "Login" : "Sign Up"}
         </Button>
+
         <div className="text-center text-sm">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <a href={isLogin ? "/register" : "/login"} className="underline underline-offset-4">

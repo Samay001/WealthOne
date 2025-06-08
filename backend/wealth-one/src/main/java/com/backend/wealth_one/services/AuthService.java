@@ -25,8 +25,24 @@ public class AuthService implements UserDetailsService {
     }
 
     public User registerUser(User user) {
+        // Add this debug logging temporarily
+        System.out.println("=== DEBUG: Received user ===");
+        System.out.println("CoindcxApiKey: " + user.getCoindcxApiKey());
+        System.out.println("CoindcxApiSecret: " + user.getCoindcxApiSecret());
+        System.out.println("UpstoxApiKey: " + user.getUpstoxApiKey());
+        System.out.println("UpstoxApiSecret: " + user.getUpstoxApiSecret());
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+
+        System.out.println("=== DEBUG: Saved user ===");
+        System.out.println("CoindcxApiKey: " + savedUser.getCoindcxApiKey());
+        System.out.println("CoindcxApiSecret: " + savedUser.getCoindcxApiSecret());
+        System.out.println("UpstoxApiKey: " + savedUser.getUpstoxApiKey());
+        System.out.println("UpstoxApiSecret: " + savedUser.getUpstoxApiSecret());
+
+        return savedUser;
     }
 
     public Optional<User> getUserByUsername(String username) {
