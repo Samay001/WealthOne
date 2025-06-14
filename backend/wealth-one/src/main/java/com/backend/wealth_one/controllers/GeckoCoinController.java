@@ -33,6 +33,7 @@ public class GeckoCoinController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
         headers.set("x-cg-demo-api-key", geckoApiKey);
+        headers.set("User-Agent", "wealth-one-app/1.0");
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 

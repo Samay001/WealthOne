@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     coindcxApiSecret,
   }: RegisterPayload) => {
     try {
-      const res = await fetch("http://localhost:8080/auth/v1/register", {
+      const res = await fetch("https://wealthone.onrender.com/auth/v1/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       //log the response status
       console.log("Registration response status:", res.status);
-      
+
       if (!res.ok) {
         const errorBody = await res.json();
         throw new Error(errorBody.message || "Registration failed");

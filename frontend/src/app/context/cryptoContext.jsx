@@ -65,8 +65,9 @@ export const CryptoProvider = ({ children }) => {
 
   // Fetch current market prices
   const fetchCmpData = useCallback(async () => {
-    const symbols = cryptoData.map((crypto) => crypto.name).join(",");
-    const url = `https://wealthone.onrender.com/api/crypto/prices?ids=${symbols}&vs_currencies=inr`;
+    // const symbols = cryptoData.map((crypto) => crypto.name).join(",");
+    // console.log("fetching current prices for : " ,symbols);
+    const url = `https://wealthone.onrender.com/api/crypto/prices?ids=bitcoin,ethereum,ripple,solana&vs_currencies=inr`;
 
     setIsLoading(true);
     setError(null);
