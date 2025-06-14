@@ -12,19 +12,18 @@ import java.util.*;
 @RequestMapping("/api/crypto")
 public class GeckoCoinController {
 
-    @Value("${gecko.api.key}")
-    private String geckoApiKey;
+    @Value("${coinmarketcap.api.key}")
+    private String cmcApiKey;
 
-    private final String geckoBaseUrl = "https://api.coingecko.com/api/v3";
+    private final String cmcBaseUrl = "https://pro-api.coinmarketcap.com";
     private final RestTemplate restTemplate;
 
-    // Constructor injection for RestTemplate
     public GeckoCoinController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    private Map<String, Object> callGeckoApi(HttpMethod method, String endpoint, Map<String, String> params) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(geckoBaseUrl + endpoint);
+    private Map<String, Object> callCmcApi(HttpMethod method, String endpoint, Map<String, String> params) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(cmcBaseUrl + endpoint);
 
         if (params != null && !params.isEmpty()) {
             params.forEach(uriBuilder::queryParam);
@@ -32,8 +31,7 @@ public class GeckoCoinController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
-        headers.set("x-cg-demo-api-key", geckoApiKey);
-        headers.set("User-Agent", "wealth-one-app/1.0");
+        headers.set("X-CMC_PRO_API_KEY", cmcApiKey);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
@@ -51,18 +49,18 @@ public class GeckoCoinController {
 
     @GetMapping("/prices")
     public Map<String, Object> getCryptoPrices(
-            @RequestParam(defaultValue = "solana") String ids,
-            @RequestParam(defaultValue = "inr") String vsCurrencies) {
+            @RequestParam(defaultValue = "BTC,ETH") String symbol,
+            @RequestParam(defaultValue = "INR") String convert) {
 
         Map<String, String> params = new HashMap<>();
-        params.put("ids", ids);
-        params.put("vs_currencies", vsCurrencies);
+        params.put("symbol", symbol);
+        params.put("convert", convert);
 
-        return callGeckoApi(HttpMethod.GET, "/simple/price", params);
+        return callCmcApi(HttpMethod.GET, "/v1/cryptocurrency/quotes/latest", params);
     }
 
-    @GetMapping("/trending")
-    public Map<String, Object> getTrendingCoins() {
-        return callGeckoApi(HttpMethod.GET, "/search/trending", null);
+    @GetMapping("/map")
+    public Map<String, Object> getCryptoMap() {
+        return callCmcApi(HttpMethod.GET, "/v1/cryptocurrency/map", null);
     }
 }

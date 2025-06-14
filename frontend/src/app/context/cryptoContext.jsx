@@ -25,72 +25,14 @@ export const CryptoProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load saved prices from localStorage on mount
-  useEffect(() => {
-    const savedCmp = localStorage.getItem("cmpPrices");
-    if (savedCmp) {
-      try {
-        const parsed = JSON.parse(savedCmp);
-        setCmpPrices(parsed);
-        setCmpVisible(true);
-      } catch (error) {
-        console.error("Failed to parse saved CMP data", error);
-        localStorage.removeItem("cmpPrices");
-      }
-    }
-  }, []);
-
-  // Calculate totals whenever prices change
-  useEffect(() => {
-    if (!cmpVisible) return;
-
-    let totalInvestment = 0;
-    let totalBalance = 0;
-
-    cryptoData.forEach((crypto) => {
-      const cmp = cmpPrices[crypto.name]?.inr;
-      const investment = crypto.price * crypto.quantity;
-      const currentValue = cmp ? cmp * crypto.quantity : 0;
-
-      totalInvestment += investment;
-      totalBalance += currentValue;
-    });
-
-    setTotalCryptoInvestment(Math.round(totalInvestment));
-    setTotalCryptoBalance(Math.round(totalBalance));
-    setTotalCryptoReturn(
-      totalInvestment > 0 ? ((totalBalance - totalInvestment) / totalInvestment) * 100 : 0
-    );
-  }, [cmpPrices, cmpVisible]);
-
-  // Fetch current market prices
-  const fetchCmpData = useCallback(async () => {
-    // const symbols = cryptoData.map((crypto) => crypto.name).join(",");
-    // console.log("fetching current prices for : " ,symbols);
-    const url = `https://wealthone.onrender.com/api/crypto/prices?ids=bitcoin,ethereum,ripple,solana&vs_currencies=inr`;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.get(url);
-      setCmpPrices(response.data);
-      setCmpVisible(true);
-      localStorage.setItem("cmpPrices", JSON.stringify(response.data));
-    } catch (error) {
-      console.error("Failed to fetch CMP data", error);
-      setError("Failed to fetch current market prices");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Get individual crypto data with calculated values
+  // Memoize getCryptoData to avoid re-running calculations unnecessarily
   const getCryptoData = useCallback(() => {
     return cryptoData.map((crypto) => {
-      const cmp = cmpPrices[crypto.name]?.inr;
-      const investment = Math.round(crypto.price * crypto.quantity);
-      const currentValue = cmp ? Math.round(cmp * crypto.quantity) : null;
+      // Strip "INR" from the symbol to match the keys in cmpPrices (e.g., "BTC")
+      const baseSymbol = crypto.symbol.replace('INR', '');
+      const cmp = cmpPrices[baseSymbol]?.inr;
+      const investment = Math.round(parseFloat(crypto.price) * parseFloat(crypto.quantity));
+      const currentValue = cmp ? Math.round(cmp * parseFloat(crypto.quantity)) : null;
       const returnAmount = currentValue !== null ? currentValue - investment : null;
       const returnPercentage = investment > 0 && currentValue !== null 
         ? ((currentValue - investment) / investment) * 100 
@@ -108,6 +50,105 @@ export const CryptoProvider = ({ children }) => {
     });
   }, [cmpPrices, cmpVisible]);
 
+  // Load saved prices from localStorage on mount
+  useEffect(() => {
+    const savedCmp = localStorage.getItem("cmpPrices");
+    if (savedCmp) {
+      try {
+        const parsed = JSON.parse(savedCmp);
+        setCmpPrices(parsed);
+        setCmpVisible(true);
+      } catch (error) {
+        console.error("Failed to parse saved CMP data", error);
+        localStorage.removeItem("cmpPrices");
+      }
+    }
+  }, []);
+
+  // Calculate totals whenever prices or data change
+  useEffect(() => {
+    const data = getCryptoData();
+    const { totalInvestment, totalBalance } = data.reduce(
+      (acc, crypto) => {
+        acc.totalInvestment += crypto.investment;
+        acc.totalBalance += crypto.currentValue ?? crypto.investment;
+        return acc;
+      },
+      { totalInvestment: 0, totalBalance: 0 }
+    );
+
+    setTotalCryptoInvestment(Math.round(totalInvestment));
+    setTotalCryptoBalance(Math.round(totalBalance));
+
+    if (totalInvestment > 0) {
+      const newReturn = ((totalBalance - totalInvestment) / totalInvestment) * 100;
+      setTotalCryptoReturn(newReturn);
+    } else {
+      setTotalCryptoReturn(0);
+    }
+  }, [cmpPrices, cmpVisible, getCryptoData]);
+
+  const fetchCmpData = useCallback(async () => {
+    // Strip "INR" from each symbol before creating the API query string
+    const symbols = cryptoData.map(c => c.symbol.replace('INR', '')).join(',');
+    if (!symbols) {
+        setError("No crypto symbols found in the data file.");
+        return;
+    }
+    
+    const url = `https://wealthone.onrender.com/api/crypto/prices?symbol=${symbols}&convert=INR`; 
+    console.log("Fetching CMP data from URL:", url);
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+        const response = await axios.get(url);
+        console.log("Received API response:", response);
+
+        if (!response.data || !response.data.data) {
+            console.error("API response is missing the 'data' field.", response.data);
+            setError("Received an invalid response from the API.");
+            setIsLoading(false);
+            return;
+        }
+
+        const apiData = response.data.data;
+        const formattedPrices = {};
+
+        Object.keys(apiData).forEach(symbol => {
+            const quote = apiData[symbol]?.quote?.INR;
+            if (quote && quote.price) {
+                formattedPrices[symbol] = {
+                    inr: Math.round(quote.price)
+                };
+            } else {
+                console.warn(`Price data for symbol '${symbol}' not found in API response.`);
+            }
+        });
+
+        if (Object.keys(formattedPrices).length === 0) {
+            console.error("Could not format any prices from the API response.", apiData);
+            setError("Could not extract any prices. Check if symbols in your data match the API.");
+        } else {
+            console.log("Successfully formatted prices:", formattedPrices);
+            setCmpPrices(formattedPrices);
+            setCmpVisible(true);
+            localStorage.setItem("cmpPrices", JSON.stringify(formattedPrices));
+        }
+
+    } catch (error) {
+        console.error("Failed to fetch CMP data:", error);
+        let errorMessage = "Failed to fetch market prices.";
+        if (error.code === "ERR_NETWORK") {
+            errorMessage += " This could be a CORS issue or the API server might be down. Check the browser console for details.";
+        }
+        setError(errorMessage);
+    } finally {
+        setIsLoading(false);
+    }
+  }, []);
+
   // Clear all data
   const clearData = useCallback(() => {
     setCmpPrices({});
@@ -120,21 +161,15 @@ export const CryptoProvider = ({ children }) => {
   }, []);
 
   const value = {
-    // State
-    cmpPrices,
     cmpVisible,
     totalCryptoBalance,
     totalCryptoInvestment,
     totalCryptoReturn,
     isLoading,
     error,
-    
-    // Methods
     fetchCmpData,
     getCryptoData,
     clearData,
-    
-    // Raw crypto data
     cryptoData
   };
 

@@ -193,7 +193,7 @@ const Page = () => {
                   <BarChart data={barChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis dataKey="name" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" />
+                    <YAxis stroke="#9CA3AF" tickFormatter={(value) => formatCurrency(value)} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1f2937',
@@ -266,11 +266,12 @@ const Page = () => {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-lg">
-                          {crypto.name.charAt(0)}
+                          {/* Assuming the first letter of the symbol is desired */}
+                          {crypto.symbol.charAt(0)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-lg uppercase tracking-wide text-white">{crypto.name}</h3>
+                        <h3 className="font-bold text-lg tracking-wide text-white">{crypto.name}</h3>
                         <p className="text-sm text-gray-300 truncate">{crypto.symbol}</p>
                       </div>
                     </div>
