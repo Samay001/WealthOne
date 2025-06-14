@@ -27,26 +27,36 @@ public class StockPriceService implements StockService {
 
     @Override
     public Object getStockPrice(String stockName) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-API-KEY", apiKey);
-        headers.set("Content-Type", "application/json");
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-API-KEY", apiKey);
+            headers.set("Content-Type", "application/json");
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/stock")
-                .queryParam("name", stockName);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/stock")
+                    .queryParam("name", stockName);
 
-        HttpEntity<?> entity = new HttpEntity<>(headers);
+            HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
-                builder.toUriString(),
-                HttpMethod.GET,
-                entity,
-                Map.class);
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    builder.toUriString(),
+                    HttpMethod.GET,
+                    entity,
+                    Map.class
+            );
 
-        Map<String, Object> responseBody = response.getBody();
-        if (responseBody != null && responseBody.containsKey("currentPrice")) {
-            return Map.of("currentPrice", responseBody.get("currentPrice"));
-        } else {
-            return Map.of("error", "Price not found");
+            Map<String, Object> responseBody = response.getBody();
+            if (responseBody != null && responseBody.containsKey("currentPrice")) {
+                return Map.of("currentPrice", responseBody.get("currentPrice"));
+            } else {
+                return Map.of("error", "Price not found");
+            }
+
+        } catch (Exception ex) {
+            // Log the exception (you can use a logger here)
+            System.err.println("Error fetching stock price: " + ex.getMessage());
+
+            // Return a well-formed response instead of propagating the exception
+            return Map.of("error", "Failed to fetch stock price");
         }
     }
 }
