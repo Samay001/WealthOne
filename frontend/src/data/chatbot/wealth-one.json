@@ -35,17 +35,6 @@
       "responseLength": "Brief and focused"
     }
   },
-  "apiIntegration": {
-    "coinDCX": {
-      "purpose": "Fetch real-time data for cryptocurrencies",
-      "endpointsUsed": ["/market_data", "/ticker"]
-    },
-    "upstox": {
-      "purpose": "Get Indian stock data, including price, volume, and trends",
-      "authentication": "Access token via OAuth",
-      "endpointsUsed": ["/quotes", "/positions", "/portfolio"]
-    }
-  },
   "sampleUserQuery": [
     "What are my top-performing assets?",
     "Give a summary of my crypto holdings.",
@@ -53,10 +42,10 @@
     "What is the total value of my investments today?"
   ],
   "developer": {
-    "name": "Samay",
-    "github": "https://github.com/samay0001",
-    "portfolio": "https://your-portfolio-link.com",
-    "contact": "youremail@example.com"
+    "name": "Samay Rathod",
+    "github": "https://github.com/Samay001",
+    "portfolio": "https://samayrathod1.vercel.app",
+    "contact": "samayrathod1@gmail.com"
   },
   "status": "In Development",
   "version": "1.0.0",

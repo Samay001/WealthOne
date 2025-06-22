@@ -6,6 +6,7 @@ import { useCrypto } from '../context/cryptoContext';
 import { useStock } from '../context/stockContext';
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 const UnifiedDashboard = ({ 
   // Crypto context
@@ -168,7 +169,9 @@ const UnifiedDashboard = ({
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div className="flex justify-between w-full sm:w-auto">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Portfolio Dashboard</h1>
+                <Link href={"/"}>
+                  <h1 className="text-3xl font-bold tracking-tight text-white">Portfolio Dashboard</h1>
+                </Link>
                 <p className="text-gray-400 mt-1">
                   Unified view of your investments
                 </p>

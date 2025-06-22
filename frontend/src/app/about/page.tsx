@@ -1,4 +1,5 @@
 import Image from "next/image";
+import DashboardImage from "@/assests/dashboard_new.png";
 
 export default function About() {
   return (
@@ -97,14 +98,14 @@ export default function About() {
             {/* Gradient border glow */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-10 group-hover:opacity-40 transition duration-1000"></div>
 
-            {/* Image container with brightness */}
+            {/* Image container without brightness */}
             <div className="relative rounded-xl overflow-hidden border border-slate-800/50 shadow-2xl shadow-blue-900/20 transform group-hover:scale-[1.01] transition duration-500">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-xtlnhq1FKT9eljbJPPuhpibuyqAA8b.png"
+                src={DashboardImage}
                 alt="Wealth Dashboard"
                 width={1200}
                 height={800}
-                className="w-full h-auto filter brightness-170"
+                className="w-full h-auto"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a20]/80 via-transparent to-transparent"></div>
             </div>

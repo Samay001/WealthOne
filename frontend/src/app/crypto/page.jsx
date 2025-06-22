@@ -9,6 +9,7 @@ import { RefreshCw, TrendingUp, TrendingDown, DollarSign, PieChart, BarChart3, A
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { useCrypto } from '@/app/context/cryptoContext'
 import { useRouter } from 'next/navigation'
+import Link from "next/link";
 
 const Page = () => {
   const {
@@ -80,7 +81,9 @@ const Page = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
             <div className="flex justify-between w-full sm:w-auto">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Crypto Dashboard</h1>
+                <Link href={"/dashboard"}>
+                  <h1 className="text-3xl font-bold tracking-tight text-white">Crypto Dashboard</h1>
+                </Link>
                 {cmpVisible && (
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="h-4 w-4 text-gray-300" />
