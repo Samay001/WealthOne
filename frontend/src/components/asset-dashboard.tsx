@@ -3,7 +3,7 @@
 import { Activity, ArrowDownRight, ArrowUpRight, CircleDollarSign, Layers3, RefreshCw, Scale, Wallet } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
+import { DashboardChartTooltip, PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
 
 type Asset = {
   id?: string | number;
@@ -31,11 +31,6 @@ type Props = {
   accent: string;
   secondary: string;
 };
-
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) {
-  if (!active || !payload?.length) return null;
-  return <div className="rounded-xl border border-white/10 bg-[#101c18] px-3 py-2 shadow-xl"><p className="mb-1 text-[10px] font-semibold text-white/45">{label}</p>{payload.map((item) => <p key={item.name} className="text-xs text-white/75"><span className="mr-1.5 inline-block size-1.5 rounded-full" style={{ background: item.color }} />{item.name}: {formatCurrency(item.value)}</p>)}</div>;
-}
 
 export function AssetDashboard({ kind, eyebrow, description, assets, loading, error, lastUpdated, onRefresh, accent, secondary }: Props) {
   const normalized = assets.map((asset) => {
@@ -73,12 +68,12 @@ export function AssetDashboard({ kind, eyebrow, description, assets, loading, er
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.35fr_0.8fr]">
         <SectionCard className="p-5 sm:p-6">
           <div className="flex items-center justify-between"><div><p className="text-sm font-semibold text-white">Value vs. cost</p><p className="mt-1 text-xs text-white/35">Position-level performance in INR</p></div><Scale className="size-4 text-white/25" /></div>
-          <div className="mt-6 h-[260px]"><ResponsiveContainer width="100%" height="100%"><BarChart data={normalized} barGap={4}><CartesianGrid vertical={false} stroke="rgba(255,255,255,.06)" /><XAxis dataKey="symbol" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.38)", fontSize: 10 }} dy={8} /><YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.25)", fontSize: 10 }} tickFormatter={(value) => formatCurrency(Number(value), true)} width={55} /><Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,.025)" }} /><Bar dataKey="investment" name="Invested" fill="rgba(255,255,255,.16)" radius={[5, 5, 0, 0]} /><Bar dataKey="currentValue" name="Current" fill={accent} radius={[5, 5, 0, 0]} /></BarChart></ResponsiveContainer></div>
+          <div className="mt-6 h-[260px]"><ResponsiveContainer width="100%" height="100%"><BarChart data={normalized} barGap={4}><CartesianGrid vertical={false} stroke="rgba(255,255,255,.06)" /><XAxis dataKey="symbol" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.38)", fontSize: 10 }} dy={8} /><YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,.25)", fontSize: 10 }} tickFormatter={(value) => formatCurrency(Number(value), true)} width={55} /><Tooltip content={<DashboardChartTooltip />} cursor={{ fill: "rgba(200,255,98,.045)" }} /><Bar dataKey="investment" name="Invested" fill="rgba(255,255,255,.16)" radius={[5, 5, 0, 0]} activeBar={{ fill: "rgba(255,255,255,.3)" }} /><Bar dataKey="currentValue" name="Current" fill={accent} radius={[5, 5, 0, 0]} activeBar={{ fill: secondary }} /></BarChart></ResponsiveContainer></div>
         </SectionCard>
 
         <SectionCard className="p-5 sm:p-6">
           <div className="flex items-center justify-between"><div><p className="text-sm font-semibold text-white">Allocation</p><p className="mt-1 text-xs text-white/35">Share of {kind.toLowerCase()} value</p></div><Layers3 className="size-4 text-white/25" /></div>
-          <div className="relative mx-auto mt-4 h-[210px] max-w-[240px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocation} dataKey="value" innerRadius={58} outerRadius={87} paddingAngle={3} stroke="none">{allocation.map((entry) => <Cell key={entry.name} fill={entry.color} opacity={0.62 + (allocation.indexOf(entry) * 0.1)} />)}</Pie><Tooltip formatter={(value) => formatCurrency(Number(value))} contentStyle={{ background: "#101c18", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, fontSize: 11 }} /></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-[10px] uppercase tracking-widest text-white/25">Positions</p><p className="mt-1 text-2xl font-semibold text-white">{normalized.length}</p></div></div></div>
+          <div className="relative mx-auto mt-4 h-[210px] max-w-[240px]"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocation} dataKey="value" innerRadius={58} outerRadius={87} paddingAngle={3} stroke="none">{allocation.map((entry) => <Cell key={entry.name} fill={entry.color} opacity={0.62 + (allocation.indexOf(entry) * 0.1)} />)}</Pie><Tooltip content={<DashboardChartTooltip />} /></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-[10px] uppercase tracking-widest text-white/25">Positions</p><p className="mt-1 text-2xl font-semibold text-white">{normalized.length}</p></div></div></div>
           {best ? <div className="rounded-xl bg-white/[0.035] px-3 py-2.5 text-xs text-white/38"><span className="font-medium text-white/70">{best.symbol}</span> is currently the strongest position at <span style={{ color: best.returnPercentage >= 0 ? "#72efb1" : "#ff8792" }}>{best.returnPercentage >= 0 ? "+" : ""}{best.returnPercentage.toFixed(2)}%</span>.</div> : null}
         </SectionCard>
       </div>
@@ -98,4 +93,3 @@ export function AssetDashboard({ kind, eyebrow, description, assets, loading, er
     </DashboardShell>
   );
 }
-

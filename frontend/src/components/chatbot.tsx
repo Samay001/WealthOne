@@ -3,21 +3,45 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bot, ChevronDown, MessageCircle, Send, Sparkles, User, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useCrypto } from "@/app/context/cryptoContext";
+import { useStock } from "@/app/context/stockContext";
 
 interface Message {
   id: string;
   role: "assistant" | "user";
   content: string;
+  sources?: Array<{ title: string; url: string }>;
 }
 
-const starters = ["Review my allocation", "What is my biggest risk?", "Explain my portfolio return"];
+type ContextAsset = {
+  name: string;
+  symbol: string;
+  quantity: string | number;
+  price: string | number;
+  cmp?: number | null;
+  investment?: number;
+  currentValue?: number | null;
+  returnAmount?: number | null;
+  returnPercentage?: number | null;
+  hasCurrentData?: boolean;
+};
+
+const starters = ["Review my portfolio today", "What is my biggest risk?", "How are my holdings moving today?"];
 
 export default function ChatBot() {
+  const { fetchAllCmpPrices, getStockData } = useStock() as {
+    fetchAllCmpPrices: () => Promise<Record<string, number>>;
+    getStockData: (prices?: Record<string, number>) => ContextAsset[];
+  };
+  const { fetchCmpData, getCryptoData } = useCrypto() as {
+    fetchCmpData: () => Promise<Record<string, { inr: number }> | undefined>;
+    getCryptoData: (prices?: Record<string, { inr: number }>, visible?: boolean) => ContextAsset[];
+  };
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: "welcome", role: "assistant", content: "Hi, I’m your **WealthOne AI advisor**. I can help you understand allocation, risk, and the positions in this portfolio." },
+    { id: "welcome", role: "assistant", content: "Hi, I’m your **WealthOne AI advisor**. I refresh portfolio prices before each answer and can explain today’s movement, allocation, returns, and risk." },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -33,14 +57,82 @@ export default function ChatBot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/gemini", {
+      const [stockRefresh, cryptoRefresh] = await Promise.allSettled([
+        fetchAllCmpPrices(),
+        fetchCmpData(),
+      ]);
+      const refreshedStockPrices = stockRefresh.status === "fulfilled"
+        ? stockRefresh.value
+        : {};
+      const refreshedCryptoPrices = cryptoRefresh.status === "fulfilled" && cryptoRefresh.value
+        ? cryptoRefresh.value
+        : {};
+
+      const stocks = getStockData(refreshedStockPrices).map((asset) => ({
+        assetClass: "stock" as const,
+        name: asset.name,
+        symbol: asset.symbol,
+        quantity: Number(asset.quantity),
+        averagePrice: Number(asset.price),
+        currentPrice: asset.cmp ?? null,
+        investment: asset.investment ?? Number(asset.price) * Number(asset.quantity),
+        currentValue: asset.currentValue ?? asset.investment ?? Number(asset.price) * Number(asset.quantity),
+        returnAmount: asset.returnAmount ?? 0,
+        returnPercentage: asset.returnPercentage ?? 0,
+        hasLivePrice: Boolean(asset.hasCurrentData),
+      }));
+      const crypto = getCryptoData(refreshedCryptoPrices, Object.keys(refreshedCryptoPrices).length > 0).map((asset) => ({
+        assetClass: "crypto" as const,
+        name: asset.name,
+        symbol: asset.symbol.replace("INR", ""),
+        quantity: Number(asset.quantity),
+        averagePrice: Number(asset.price),
+        currentPrice: asset.cmp ?? null,
+        investment: asset.investment ?? Number(asset.price) * Number(asset.quantity),
+        currentValue: asset.currentValue ?? asset.investment ?? Number(asset.price) * Number(asset.quantity),
+        returnAmount: asset.returnAmount ?? 0,
+        returnPercentage: asset.returnPercentage ?? 0,
+        hasLivePrice: Boolean(asset.hasCurrentData),
+      }));
+      const holdings = [...stocks, ...crypto];
+      const investment = holdings.reduce((sum, asset) => sum + asset.investment, 0);
+      const currentValue = holdings.reduce((sum, asset) => sum + asset.currentValue, 0);
+      const stockValue = stocks.reduce((sum, asset) => sum + asset.currentValue, 0);
+      const cryptoValue = crypto.reduce((sum, asset) => sum + asset.currentValue, 0);
+      const returnAmount = currentValue - investment;
+
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          portfolio: {
+            currency: "INR",
+            generatedAt: new Date().toISOString(),
+            holdings,
+            summary: {
+              currentValue,
+              investment,
+              returnAmount,
+              returnPercentage: investment ? (returnAmount / investment) * 100 : 0,
+              stockValue,
+              cryptoValue,
+            },
+            source: {
+              holdings: "WealthOne frontend portfolio data",
+              prices: "Freshly requested from the WealthOne Spring Boot market-price API immediately before this chat request",
+            },
+          },
+        }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to reach the advisor");
-      setMessages((current) => [...current, { id: `${Date.now()}-assistant`, role: "assistant", content: data.text }]);
+      setMessages((current) => [...current, {
+        id: `${Date.now()}-assistant`,
+        role: "assistant",
+        content: data.text,
+        sources: data.sources,
+      }]);
     } catch {
       setMessages((current) => [...current, { id: `${Date.now()}-error`, role: "assistant", content: "I couldn’t complete that request. Please try again in a moment." }]);
     } finally {
@@ -60,7 +152,7 @@ export default function ChatBot() {
           <header className="border-b border-white/[0.07] px-4 py-4">
             <div className="flex items-center gap-3">
               <div className="relative grid size-10 place-items-center rounded-2xl bg-[#c8ff62] text-[#07100d]"><Sparkles className="size-4" /><span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-[#0b1512] bg-[#6ee7a8]" /></div>
-              <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h2 className="text-sm font-semibold">WealthOne AI</h2><span className="rounded-full bg-[#c8ff62]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#c8ff62]">Gemini 2.5 Flash</span></div><p className="mt-0.5 text-[11px] text-white/35">Portfolio intelligence, on demand</p></div>
+              <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h2 className="text-sm font-semibold">WealthOne AI</h2><span className="rounded-full bg-[#c8ff62]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#c8ff62]">GPT-4.1</span></div><p className="mt-0.5 text-[11px] text-white/35">Portfolio intelligence, on demand</p></div>
               <button onClick={() => setIsOpen(false)} className="grid size-8 place-items-center rounded-xl text-white/35 transition hover:bg-white/[0.06] hover:text-white" aria-label="Close assistant"><ChevronDown className="size-4" /></button>
             </div>
           </header>
@@ -72,6 +164,7 @@ export default function ChatBot() {
                   {message.role === "assistant" ? <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#c8ff62]/10 text-[#c8ff62]"><Bot className="size-3.5" /></div> : null}
                   <div className={`max-w-[82%] rounded-2xl px-3.5 py-3 text-[13px] leading-6 ${message.role === "user" ? "rounded-br-md bg-[#c8ff62] text-[#07100d]" : "rounded-bl-md border border-white/[0.07] bg-white/[0.045] text-white/72"}`}>
                     <ReactMarkdown components={{ p: ({ children }) => <p>{children}</p>, strong: ({ children }) => <strong className="font-semibold text-inherit">{children}</strong>, ul: ({ children }) => <ul className="mt-2 list-disc space-y-1 pl-4">{children}</ul>, a: ({ children, href }) => <a href={href} target="_blank" rel="noreferrer" className="underline underline-offset-2">{children}</a> }}>{message.content}</ReactMarkdown>
+                    {message.sources?.length ? <div className="mt-3 border-t border-white/[0.07] pt-2"><p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-white/30">Live sources</p><div className="flex flex-wrap gap-1.5">{message.sources.map((source, index) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer" className="max-w-full truncate rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] text-[#c8ff62] transition hover:bg-white/[0.1]" title={source.title}>{index + 1}. {source.title}</a>)}</div></div> : null}
                   </div>
                   {message.role === "user" ? <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#a78bfa]/15 text-[#b9a4ff]"><User className="size-3.5" /></div> : null}
                 </div>
@@ -101,4 +194,3 @@ export default function ChatBot() {
     </div>
   );
 }
-

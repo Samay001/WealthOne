@@ -3,9 +3,9 @@
   "description": "Wealth One is a unified platform for analyzing funds, allowing users to track and analyze their investments in Indian stocks and cryptocurrencies using AI-powered insights.",
   "features": {
     "dashboard": "Interactive dashboard to view overall portfolio performance and trends.",
-    "aiAssistant": "Gemini-powered AI agent to provide personalized insights on user portfolio.",
-    "cryptoIntegration": "Real-time cryptocurrency data via CoinDCX API.",
-    "stockIntegration": "Indian stock market data via Upstox API.",
+    "aiAssistant": "GPT-4.1-powered AI assistant that refreshes dashboard prices before analysis and uses live web search for current market context.",
+    "cryptoIntegration": "Cryptocurrency holdings come from the frontend portfolio dataset and live prices are requested through the WealthOne Spring Boot API.",
+    "stockIntegration": "Stock holdings come from the frontend portfolio dataset and live prices are requested through the WealthOne Spring Boot API.",
     "portfolioAnalysis": "Detailed breakdown of holdings, gains/losses, and risk insights.",
     "userQueries": "Users can ask portfolio-related questions and receive smart answers.",
     "responsiveDesign": "Fully responsive interface optimized for mobile, tablet, and desktop."
@@ -13,26 +13,26 @@
   "technologies": {
     "frontend": ["React.js", "Tailwind CSS", "Next.js"],
     "backend": [
-      "Node.js",
       "Next.js API Routes",
-      "Google Generative AI (Gemini)",
-      "Express (optional)"
+      "Spring Boot",
+      "OpenAI Responses API",
+      "GPT-4.1"
     ],
-    "APIs": ["CoinDCX", "Upstox", "Google Generative AI"],
-    "hosting": ["Vercel or custom deployment"],
-    "auth": ["JWT-based auth or Firebase (optional)"]
+    "APIs": ["WealthOne Spring Boot API", "CoinMarketCap", "Stock market price provider", "OpenAI"],
+    "hosting": ["Vercel", "Render"],
+    "auth": ["JWT-based authentication"]
   },
   "aiAssistant": {
-    "model": "Gemini 2.0 Flash",
-    "apiProvider": "Google Generative AI",
+    "model": "GPT-4.1",
+    "apiProvider": "OpenAI",
     "promptFormatting": {
       "emphasis": "Uses **bold** for key points and *italic* for emphasis",
       "responseStyle": "Short, concise, and formatted for readability"
     },
-    "contextData": "Portfolio details from a static or dynamic JSON file",
+    "contextData": "A freshly requested and calculated portfolio snapshot supplied by the same dashboard contexts, this product knowledge file, and live web-search sources for current price movement, news, and market context",
     "customization": {
-      "queryTypes": ["crypto", "stocks", "summary"],
-      "responseLength": "Brief and focused"
+      "queryTypes": ["crypto", "stocks", "summary", "allocation", "risk", "current market guidance"],
+      "responseLength": "Concise, evidence-backed, and focused"
     }
   },
   "sampleUserQuery": [
@@ -47,7 +47,7 @@
     "portfolio": "https://samayrathod1.vercel.app",
     "contact": "samayrathod1@gmail.com"
   },
-  "status": "In Development",
-  "version": "1.0.0",
-  "lastUpdated": "2025-04-14"
+  "status": "Active development",
+  "version": "1.1.0",
+  "lastUpdated": "2026-09-29"
 }

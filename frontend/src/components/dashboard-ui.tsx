@@ -3,6 +3,46 @@
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type TooltipEntry = {
+  color?: string;
+  dataKey?: string | number;
+  fill?: string;
+  name?: string;
+  value?: number | string;
+  payload?: { color?: string; name?: string };
+};
+
+export function DashboardChartTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+
+  const title = label || payload[0]?.payload?.name || payload[0]?.name;
+
+  return (
+    <div className="min-w-[132px] rounded-xl border border-white/10 bg-[#101c18] px-3 py-2.5 text-[#f2f6ef] shadow-[0_16px_40px_rgba(0,0,0,.45)]">
+      {title ? <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/50">{title}</p> : null}
+      <div className="space-y-1">
+        {payload.map((item, index) => (
+          <div key={`${String(item.dataKey || item.name)}-${index}`} className="flex items-center justify-between gap-4 text-xs">
+            <span className="flex items-center gap-1.5 text-white/60">
+              <span className="size-1.5 rounded-full" style={{ background: item.color || item.fill || item.payload?.color || "#c8ff62" }} />
+              {label ? item.name : "Value"}
+            </span>
+            <span className="font-semibold text-white">{formatCurrency(Number(item.value || 0))}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export const formatCurrency = (value: number, compact = false) => {
   const safeValue = Number.isFinite(value) ? value : 0;
   if (compact) {

@@ -6,7 +6,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useCrypto } from "../context/cryptoContext";
 import { useStock } from "../context/stockContext";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
+import { DashboardChartTooltip, PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
 
 const allocationColors = ["#c8ff62", "#a78bfa"];
 
@@ -55,7 +55,7 @@ export default function DashboardPage() {
       <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.35fr]">
         <SectionCard className="p-5 sm:p-6">
           <div className="flex items-center justify-between"><div><p className="text-sm font-semibold text-white">Asset allocation</p><p className="mt-1 text-xs text-white/35">Current portfolio mix</p></div><ChartPie className="size-4 text-white/25" /></div>
-          <div className="mt-3 grid grid-cols-[1fr_112px] items-center gap-2"><div className="space-y-4">{allocation.map((item, index) => <div key={item.name}><div className="flex items-center gap-2 text-xs text-white/45"><span className="size-2 rounded-full" style={{ background: allocationColors[index] }} />{item.name}</div><div className="mt-1 flex items-baseline gap-2"><span className="text-lg font-semibold text-white">{current ? ((item.value / current) * 100).toFixed(1) : 0}%</span><span className="text-[10px] text-white/25">{formatCurrency(item.value, true)}</span></div></div>)}</div><div className="relative h-32"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocation} dataKey="value" innerRadius={39} outerRadius={57} paddingAngle={4} stroke="none">{allocation.map((entry, index) => <Cell key={entry.name} fill={allocationColors[index]} />)}</Pie><Tooltip formatter={(value) => formatCurrency(Number(value))} contentStyle={{ background: "#111e19", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, fontSize: 11 }} /></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 grid place-items-center text-[10px] font-medium text-white/35">MIX</div></div></div>
+          <div className="mt-3 grid grid-cols-[1fr_112px] items-center gap-2"><div className="space-y-4">{allocation.map((item, index) => <div key={item.name}><div className="flex items-center gap-2 text-xs text-white/45"><span className="size-2 rounded-full" style={{ background: allocationColors[index] }} />{item.name}</div><div className="mt-1 flex items-baseline gap-2"><span className="text-lg font-semibold text-white">{current ? ((item.value / current) * 100).toFixed(1) : 0}%</span><span className="text-[10px] text-white/25">{formatCurrency(item.value, true)}</span></div></div>)}</div><div className="relative h-32"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocation} dataKey="value" innerRadius={39} outerRadius={57} paddingAngle={4} stroke="none">{allocation.map((entry, index) => <Cell key={entry.name} fill={allocationColors[index]} />)}</Pie><Tooltip content={<DashboardChartTooltip />} /></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 grid place-items-center text-[10px] font-medium text-white/35">MIX</div></div></div>
         </SectionCard>
 
         <SectionCard className="overflow-hidden">

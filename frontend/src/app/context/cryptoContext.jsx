@@ -26,11 +26,11 @@ export const CryptoProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Memoize getCryptoData to avoid re-running calculations unnecessarily
-  const getCryptoData = useCallback(() => {
+  const getCryptoData = useCallback((prices = cmpPrices, pricesAreVisible = cmpVisible) => {
     return cryptoData.map((crypto) => {
       // Strip "INR" from the symbol to match the keys in cmpPrices (e.g., "BTC")
       const baseSymbol = crypto.symbol.replace('INR', '');
-      const cmp = cmpPrices[baseSymbol]?.inr;
+      const cmp = prices[baseSymbol]?.inr;
       const investment = Math.round(parseFloat(crypto.price) * parseFloat(crypto.quantity));
       const currentValue = cmp ? Math.round(cmp * parseFloat(crypto.quantity)) : null;
       const returnAmount = currentValue !== null ? currentValue - investment : null;
@@ -45,7 +45,7 @@ export const CryptoProvider = ({ children }) => {
         currentValue,
         returnAmount,
         returnPercentage,
-        hasCurrentData: cmpVisible && cmp !== undefined
+        hasCurrentData: pricesAreVisible && cmp !== undefined
       };
     });
   }, [cmpPrices, cmpVisible]);
@@ -135,6 +135,7 @@ export const CryptoProvider = ({ children }) => {
             setCmpPrices(formattedPrices);
             setCmpVisible(true);
             localStorage.setItem("cmpPrices", JSON.stringify(formattedPrices));
+            return formattedPrices;
         }
 
     } catch (error) {
@@ -162,6 +163,7 @@ export const CryptoProvider = ({ children }) => {
 
   const value = {
     cmpVisible,
+    cmpPrices,
     totalCryptoBalance,
     totalCryptoInvestment,
     totalCryptoReturn,

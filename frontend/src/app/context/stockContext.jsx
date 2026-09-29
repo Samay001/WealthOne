@@ -69,7 +69,7 @@ export const StockProvider = ({ children }) => {
       }
     }
 
-    setCmpPrices(updatedPrices);
+    setCmpPrices((previousPrices) => ({ ...previousPrices, ...updatedPrices }));
     const timestamp = new Date();
     setLastUpdated(timestamp);
     setDataTimestamp(timestamp.getTime());
@@ -79,6 +79,7 @@ export const StockProvider = ({ children }) => {
     }
 
     setLoading(false);
+    return updatedPrices;
   }, [fetchSingleStockPrice]);
 
   // Fetch individual stock price
@@ -99,9 +100,9 @@ export const StockProvider = ({ children }) => {
   }, [fetchSingleStockPrice]);
 
   // Get all stock data with calculated values
-  const getStockData = useCallback(() => {
+  const getStockData = useCallback((prices = cmpPrices) => {
     return stockData.map((stock) => {
-      const cmp = cmpPrices[stock.symbol];
+      const cmp = prices[stock.symbol];
       const investment = stock.price * stock.quantity;
       const currentValue = cmp ? cmp * stock.quantity : null;
       const returnAmount = currentValue !== null ? currentValue - investment : null;
