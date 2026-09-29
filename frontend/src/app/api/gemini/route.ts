@@ -3,11 +3,8 @@ import AboutContent from "@/data/chatbot/wealth-one.json" assert { type: "json" 
 import StocksContent from "@/data/sample/stock.json" assert { type: "json" };
 import CryptoContent from "@/data/sample/crypto.json" assert { type: "json" };
 
-// Validate Gemini Key
-const API_KEY = process.env.GEMINI_API_KEY;
-if (!API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined in the environment variables");
-}
+// Match the model and server-only environment variable used by Samay's portfolio.
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 // -- Utils --
 
@@ -70,6 +67,14 @@ async function getCryptoPrices(): Promise<Record<string, number>> {
 
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "The AI assistant is not configured." },
+        { status: 503 }
+      );
+    }
+
     const { prompt }: { prompt: string } = await req.json();
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -148,7 +153,7 @@ export async function POST(req: Request) {
     };
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {

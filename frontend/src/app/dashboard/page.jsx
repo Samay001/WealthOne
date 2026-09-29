@@ -1,430 +1,74 @@
-"use client"
-import React, { useState } from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, IndianRupee, Activity, RefreshCw, AlertCircle, Clock, Menu } from 'lucide-react';
-import { useCrypto } from '../context/cryptoContext';
-import { useStock } from '../context/stockContext';
-import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation';
+"use client";
+
 import Link from "next/link";
+import { ArrowRight, BriefcaseBusiness, ChartPie, CircleDollarSign, Clock3, Landmark, ShieldCheck, Sparkles, WalletCards } from "lucide-react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useCrypto } from "../context/cryptoContext";
+import { useStock } from "../context/stockContext";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
 
-const UnifiedDashboard = ({ 
-  // Crypto context
-  totalCryptoBalance,
-  totalCryptoInvestment,
-  totalCryptoReturn,
-  isLoading: cryptoLoading,
-  error: cryptoError,
-  fetchCmpData,
-  getCryptoData,
-  
-  // Stock context  
-  totalStockBalance,
-  totalStockInvestment,
-  totalStockReturn,
-  loading: stockLoading,
-  error: stockError,
-  lastUpdated,
-  fetchAllCmpPrices,
-  getStockData,
-  isDataStale
-}) => {
-  const [refreshing, setRefreshing] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
+const allocationColors = ["#c8ff62", "#a78bfa"];
 
-  // Calculate portfolio totals
-  const totalBalance = (totalCryptoBalance || 0) + (totalStockBalance || 0);
-  const totalInvestment = (totalCryptoInvestment || 0) + (totalStockInvestment || 0);
-  const totalReturn = (totalCryptoReturn || 0) + (totalStockReturn || 0);
-  const totalReturnPercent = totalInvestment > 0 ? ((totalReturn / totalInvestment) * 100).toFixed(2) : 0;
+export default function DashboardPage() {
+  const { isLoading: cryptoLoading, error: cryptoError, fetchCmpData, getCryptoData } = useCrypto();
+  const { loading: stockLoading, error: stockError, lastUpdated, fetchAllCmpPrices, getStockData } = useStock();
+  const stocks = getStockData();
+  const crypto = getCryptoData();
+  const holdings = [...stocks.map((item) => ({ ...item, assetClass: "Stock" })), ...crypto.map((item) => ({ ...item, assetClass: "Crypto", symbol: item.symbol.replace("INR", "") }))];
+  const invested = holdings.reduce((sum, item) => sum + (item.investment || 0), 0);
+  const current = holdings.reduce((sum, item) => sum + (item.currentValue ?? item.investment ?? 0), 0);
+  const returns = current - invested;
+  const returnPercent = invested ? (returns / invested) * 100 : 0;
+  const stockValue = stocks.reduce((sum, item) => sum + (item.currentValue ?? item.investment ?? 0), 0);
+  const cryptoValue = crypto.reduce((sum, item) => sum + (item.currentValue ?? item.investment ?? 0), 0);
+  const allocation = [{ name: "Stocks", value: stockValue }, { name: "Crypto", value: cryptoValue }];
+  const largestHolding = holdings.reduce((largest, item) => ((item.currentValue ?? item.investment ?? 0) > (largest?.currentValue ?? largest?.investment ?? 0) ? item : largest), holdings[0]);
+  const loading = stockLoading || cryptoLoading;
 
-  // Calculate individual return percentages
-  const cryptoReturnPercent = totalCryptoInvestment > 0 ? ((totalCryptoReturn / totalCryptoInvestment) * 100).toFixed(2) : 0;
-  const stockReturnPercent = totalStockInvestment > 0 ? ((totalStockReturn / totalStockInvestment) * 100).toFixed(2) : 0;
-
-  // Portfolio composition data for pie chart
-  const portfolioComposition = [
-    { 
-      name: 'Stocks', 
-      value: totalStockBalance || 0, 
-      color: '#3B82F6',
-      investment: totalStockInvestment || 0,
-      return: totalStockReturn || 0
-    },
-    { 
-      name: 'Crypto', 
-      value: totalCryptoBalance || 0, 
-      color: '#F59E0B',
-      investment: totalCryptoInvestment || 0,
-      return: totalCryptoReturn || 0
-    }
-  ];
-
-  // Performance comparison data for bar chart
-  const performanceData = [
-    {
-      category: 'Stocks',
-      Investment: totalStockInvestment || 0,
-      'Current Value': totalStockBalance || 0,
-      Return: totalStockReturn || 0
-    },
-    {
-      category: 'Crypto',
-      Investment: totalCryptoInvestment || 0,
-      'Current Value': totalCryptoBalance || 0,
-      Return: totalCryptoReturn || 0
-    }
-  ];
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await Promise.all([
-        fetchAllCmpPrices && fetchAllCmpPrices(),
-        fetchCmpData && fetchCmpData()
-      ]);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-    } finally {
-      setRefreshing(false);
-    }
+  const refresh = async () => {
+    await Promise.allSettled([fetchAllCmpPrices(), fetchCmpData()]);
   };
-
-  const formatCurrency = (value) => {
-    if (value === null || value === undefined) return '₹0';
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  };
-
-  const StatCard = ({ title, value, change, changePercent, icon: Icon, color = 'blue' }) => {
-    const isPositive = change >= 0;
-    const colorClasses = {
-      blue: 'bg-gray-900/50 border-gray-800',
-      green: 'bg-gray-900/50 border-gray-800',
-      orange: 'bg-gray-900/50 border-gray-800',
-      purple: 'bg-gray-900/50 border-gray-800'
-    };
-
-    return (
-      <div className={`p-6 rounded-xl border ${colorClasses[color]} backdrop-blur-sm`}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-medium text-gray-300 uppercase tracking-wide">{title}</h3>
-          <Icon className="h-6 w-6 text-gray-300" />
-        </div>
-        <div className="space-y-2">
-          <p className="text-2xl font-bold text-white">{formatCurrency(value)}</p>
-          {change !== undefined && (
-            <div className="flex items-center space-x-2">
-              {isPositive ? (
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-red-400" />
-              )}
-              <span className={`text-sm font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-                {formatCurrency(Math.abs(change))} ({Math.abs(changePercent)}%)
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-gray-900 p-3 border border-gray-800 rounded-lg">
-          <p className="font-medium text-white">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-sm text-gray-300">
-              {entry.name}: {formatCurrency(entry.value)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  if (cryptoLoading || stockLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
-          <p className="text-xl text-gray-300">Server is on Render, Might take upto a minute or two</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="border-b border-gray-800 bg-gray-950/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex justify-between w-full sm:w-auto">
-              <div>
-                <Link href={"/"}>
-                  <h1 className="text-3xl font-bold tracking-tight text-white">Portfolio Dashboard</h1>
-                </Link>
-                <p className="text-gray-400 mt-1">
-                  Unified view of your investments
-                </p>
-              </div>
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="sm:hidden text-white hover:text-gray-300"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className={`${isMenuOpen ? 'flex' : 'hidden'} sm:flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto`}>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button
-                  onClick={() => router.push('/stocks')}
-                  variant="outline"
-                  className="bg-gray-900/50 border-gray-800 text-white hover:bg-gray-800 w-full sm:w-auto"
-                >
-                  Stocks Dashboard
-                </Button>
-                <Button
-                  onClick={() => router.push('/crypto')}
-                  variant="outline"
-                  className="bg-gray-900/50 border-gray-800 text-white hover:bg-gray-800 w-full sm:w-auto"
-                >
-                  Crypto Dashboard
-                </Button>
-              </div>
-              
-              {lastUpdated && (
-                <div className="hidden md:flex items-center text-sm text-gray-400 whitespace-nowrap">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Last updated: {new Date(lastUpdated).toLocaleString()}
-                  {isDataStale && (
-                    <AlertCircle className="h-4 w-4 ml-2 text-yellow-500" />
-                  )}
-                </div>
-              )}
-              
-              <Button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="bg-white text-black hover:bg-gray-200 disabled:opacity-50 w-full sm:w-auto"
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </Button>
-            </div>
+    <DashboardShell>
+      <PageHeading eyebrow="Portfolio overview" title="Your wealth, in one place." description="A focused view of your positions, allocation, and portfolio health across Indian equities and digital assets." actions={<RefreshButton onClick={refresh} loading={loading} />} />
+
+      {(stockError || cryptoError) ? <div className="mb-5 rounded-2xl border border-[#ff8792]/20 bg-[#ff8792]/[0.06] px-4 py-3 text-xs text-[#ffacb4]">Some live prices could not be updated. Last available purchase values are shown where needed.</div> : null}
+
+      <div className="grid gap-4 xl:grid-cols-[1.55fr_1fr]">
+        <section className="relative min-h-[310px] overflow-hidden rounded-[26px] border border-[#c8ff62]/15 bg-[#c8ff62] p-6 text-[#0a120f] sm:p-8">
+          <div className="absolute -right-24 -top-28 size-[340px] rounded-full border-[55px] border-[#0a120f]/[0.055]" />
+          <div className="absolute bottom-0 right-0 h-32 w-1/2 opacity-20 [background-image:linear-gradient(135deg,transparent_25%,#07100d_25%,#07100d_28%,transparent_28%,transparent_50%,#07100d_50%,#07100d_53%,transparent_53%,transparent_75%,#07100d_75%,#07100d_78%,transparent_78%)] [background-size:24px_24px]" />
+          <div className="relative flex h-full flex-col justify-between">
+            <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0a120f]/55">Total portfolio value</p><p className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">{formatCurrency(current)}</p></div><div className="grid size-11 place-items-center rounded-2xl bg-[#0a120f] text-[#c8ff62]"><WalletCards className="size-5" /></div></div>
+            <div className="mt-16 flex flex-wrap items-end justify-between gap-5"><div><ReturnBadge value={returnPercent} suffix="total return" className="bg-[#0a120f] text-[#c8ff62]" /><p className="mt-3 text-sm text-[#0a120f]/55">{returns >= 0 ? "+" : "−"}{formatCurrency(Math.abs(returns))} on {formatCurrency(invested)} invested</p></div><div className="text-right"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#0a120f]/45">Assets tracked</p><p className="mt-1 text-2xl font-semibold">{holdings.length}</p></div></div>
           </div>
+        </section>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+          <SectionCard className="p-5"><div className="flex items-center justify-between"><div className="grid size-9 place-items-center rounded-xl bg-[#a78bfa]/10 text-[#b9a4ff]"><Landmark className="size-4" /></div><Link href="/stocks" className="text-xs text-white/35 transition hover:text-white">View stocks <ArrowRight className="ml-1 inline size-3" /></Link></div><p className="mt-6 text-xs font-medium text-white/38">Equity value</p><p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-white">{formatCurrency(stockValue)}</p><div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-[#a78bfa]" style={{ width: `${current ? (stockValue / current) * 100 : 0}%` }} /></div></SectionCard>
+          <SectionCard className="p-5"><div className="flex items-center justify-between"><div className="grid size-9 place-items-center rounded-xl bg-[#ffbd5a]/10 text-[#ffc975]"><CircleDollarSign className="size-4" /></div><Link href="/crypto" className="text-xs text-white/35 transition hover:text-white">View crypto <ArrowRight className="ml-1 inline size-3" /></Link></div><p className="mt-6 text-xs font-medium text-white/38">Digital assets</p><p className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-white">{formatCurrency(cryptoValue)}</p><div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]"><div className="h-full rounded-full bg-[#ffbd5a]" style={{ width: `${current ? (cryptoValue / current) * 100 : 0}%` }} /></div></SectionCard>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Error Messages */}
-        {(cryptoError || stockError) && (
-          <div className="bg-red-950/50 border border-red-900/50 rounded-xl p-4 mb-8">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
-              <div>
-                <h3 className="text-red-400 font-medium">Data Loading Issues</h3>
-                {cryptoError && <p className="text-red-300 text-sm">Crypto: {cryptoError}</p>}
-                {stockError && <p className="text-red-300 text-sm">Stocks: {stockError}</p>}
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.35fr]">
+        <SectionCard className="p-5 sm:p-6">
+          <div className="flex items-center justify-between"><div><p className="text-sm font-semibold text-white">Asset allocation</p><p className="mt-1 text-xs text-white/35">Current portfolio mix</p></div><ChartPie className="size-4 text-white/25" /></div>
+          <div className="mt-3 grid grid-cols-[1fr_112px] items-center gap-2"><div className="space-y-4">{allocation.map((item, index) => <div key={item.name}><div className="flex items-center gap-2 text-xs text-white/45"><span className="size-2 rounded-full" style={{ background: allocationColors[index] }} />{item.name}</div><div className="mt-1 flex items-baseline gap-2"><span className="text-lg font-semibold text-white">{current ? ((item.value / current) * 100).toFixed(1) : 0}%</span><span className="text-[10px] text-white/25">{formatCurrency(item.value, true)}</span></div></div>)}</div><div className="relative h-32"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocation} dataKey="value" innerRadius={39} outerRadius={57} paddingAngle={4} stroke="none">{allocation.map((entry, index) => <Cell key={entry.name} fill={allocationColors[index]} />)}</Pie><Tooltip formatter={(value) => formatCurrency(Number(value))} contentStyle={{ background: "#111e19", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, fontSize: 11 }} /></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 grid place-items-center text-[10px] font-medium text-white/35">MIX</div></div></div>
+        </SectionCard>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard
-            title="Total Portfolio"
-            value={totalBalance}
-            change={totalReturn}
-            changePercent={totalReturnPercent}
-            icon={IndianRupee}
-            color="blue"
-          />
-          
-          <StatCard
-            title="Stock Holdings"
-            value={totalStockBalance}
-            change={totalStockReturn}
-            changePercent={stockReturnPercent}
-            icon={TrendingUp}
-            color="green"
-          />
-          
-          <StatCard
-            title="Crypto Holdings"
-            value={totalCryptoBalance}
-            change={totalCryptoReturn}
-            changePercent={cryptoReturnPercent}
-            icon={Activity}
-            color="orange"
-          />
-          
-          <StatCard
-            title="Total Investment"
-            value={totalInvestment}
-            icon={IndianRupee}
-            color="purple"
-          />
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Portfolio Composition */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Portfolio Composition</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={portfolioComposition}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {portfolioComposition.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip content={CustomTooltip} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Performance Comparison */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Performance Comparison</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="category" stroke="#9CA3AF" />
-                <YAxis stroke="#9CA3AF" tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`} />
-                <Tooltip content={CustomTooltip} />
-                <Legend />
-                <Bar dataKey="Investment" fill="#94A3B8" name="Investment" />
-                <Bar dataKey="Current Value" fill="#3B82F6" name="Current Value" />
-                <Bar dataKey="Return" fill="#10B981" name="Return" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Portfolio Metrics */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Portfolio Metrics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-gray-950/50 rounded-lg border border-gray-800">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Asset Allocation</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Stocks:</span>
-                  <span className="text-sm font-medium text-white">
-                    {totalBalance > 0 ? ((totalStockBalance / totalBalance) * 100).toFixed(1) : 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Crypto:</span>
-                  <span className="text-sm font-medium text-white">
-                    {totalBalance > 0 ? ((totalCryptoBalance / totalBalance) * 100).toFixed(1) : 0}%
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-950/50 rounded-lg border border-gray-800">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Total Returns</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Amount:</span>
-                  <span className={`text-sm font-medium ${totalReturn >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {formatCurrency(totalReturn)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Percentage:</span>
-                  <span className={`text-sm font-medium ${totalReturn >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {totalReturnPercent}%
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-950/50 rounded-lg border border-gray-800">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Investment Summary</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Invested:</span>
-                  <span className="text-sm font-medium text-white">{formatCurrency(totalInvestment)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-400">Current:</span>
-                  <span className="text-sm font-medium text-white">{formatCurrency(totalBalance)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <SectionCard className="overflow-hidden">
+          <div className="flex items-center justify-between border-b border-white/[0.065] px-5 py-5 sm:px-6"><div><p className="text-sm font-semibold text-white">Top holdings</p><p className="mt-1 text-xs text-white/35">Ranked by current value</p></div><BriefcaseBusiness className="size-4 text-white/25" /></div>
+          <div className="divide-y divide-white/[0.055]">{[...holdings].sort((a, b) => (b.currentValue ?? b.investment ?? 0) - (a.currentValue ?? a.investment ?? 0)).slice(0, 4).map((item) => { const value = item.currentValue ?? item.investment ?? 0; const change = item.investment ? ((value - item.investment) / item.investment) * 100 : 0; return <div key={`${item.assetClass}-${item.symbol}`} className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5 transition hover:bg-white/[0.018] sm:px-6"><div className="flex min-w-0 items-center gap-3"><div className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/[0.055] text-[10px] font-bold text-white/70">{item.symbol.slice(0, 3)}</div><div className="min-w-0"><p className="truncate text-sm font-medium text-white">{item.name}</p><p className="mt-0.5 text-[10px] uppercase tracking-wider text-white/28">{item.assetClass}</p></div></div><div className="text-right"><p className="text-sm font-medium text-white">{formatCurrency(value)}</p><p className={`mt-0.5 text-[10px] ${change >= 0 ? "text-[#72efb1]" : "text-[#ff8792]"}`}>{change >= 0 ? "+" : ""}{change.toFixed(2)}%</p></div></div>; })}</div>
+        </SectionCard>
       </div>
-    </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <SectionCard className="p-5"><ShieldCheck className="size-5 text-[#72efb1]" /><p className="mt-5 text-sm font-semibold text-white">Diversification check</p><p className="mt-2 text-xs leading-5 text-white/38">{largestHolding ? `${largestHolding.symbol.replace("INR", "")} is your largest tracked position. Review concentration as values move.` : "Add holdings to evaluate concentration."}</p></SectionCard>
+        <SectionCard className="p-5"><Clock3 className="size-5 text-[#b9a4ff]" /><p className="mt-5 text-sm font-semibold text-white">Market data</p><p className="mt-2 text-xs leading-5 text-white/38">{lastUpdated ? `Equity prices synced ${new Date(lastUpdated).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}.` : "Live pricing syncs when the dashboard opens."}</p></SectionCard>
+        <SectionCard className="border-[#c8ff62]/15 bg-[#c8ff62]/[0.055] p-5"><Sparkles className="size-5 text-[#c8ff62]" /><p className="mt-5 text-sm font-semibold text-white">AI wealth assistant</p><p className="mt-2 text-xs leading-5 text-white/38">Use the assistant to explore allocation, portfolio risk, and individual positions.</p></SectionCard>
+      </div>
+    </DashboardShell>
   );
-};
-
-// Usage component that integrates your hooks
-const DashboardPage = () => {
-  const {
-    totalCryptoBalance,
-    totalCryptoInvestment,
-    totalCryptoReturn,
-    isLoading,
-    error,
-    fetchCmpData,
-    getCryptoData,
-  } = useCrypto();
-
-  const {
-    totalStockBalance,
-    totalStockInvestment,
-    totalStockReturn,
-    loading,
-    error: stockError,
-    lastUpdated,
-    fetchAllCmpPrices,
-    getStockData,
-    isDataStale
-  } = useStock();
-
-  return (
-    <UnifiedDashboard
-      totalCryptoBalance={totalCryptoBalance}
-      totalCryptoInvestment={totalCryptoInvestment}
-      totalCryptoReturn={totalCryptoReturn}
-      isLoading={isLoading}
-      error={error}
-      fetchCmpData={fetchCmpData}
-      getCryptoData={getCryptoData}
-      totalStockBalance={totalStockBalance}
-      totalStockInvestment={totalStockInvestment}
-      totalStockReturn={totalStockReturn}
-      loading={loading}
-      stockError={stockError}
-      lastUpdated={lastUpdated}
-      fetchAllCmpPrices={fetchAllCmpPrices}
-      getStockData={getStockData}
-      isDataStale={isDataStale}
-    />
-  );
-};
-
-export default DashboardPage;
+}
