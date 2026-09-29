@@ -15,8 +15,7 @@ export default function CryptoPage() {
       error={error}
       onRefresh={fetchCmpData}
       accent="#ffbd5a"
-      secondary="#c8ff62"
+      secondary="#60a5fa"
     />
   );
 }
-

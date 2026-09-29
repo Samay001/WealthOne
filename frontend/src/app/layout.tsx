@@ -6,7 +6,7 @@ import { CryptoProvider } from "@/app/context/cryptoContext";
 import { StockProvider } from "@/app/context/stockContext";
 import { AuthProvider } from "./context/AuthContext";
 
-import ChatBot from "@/components/chatbot";
+import { ChatBotGate } from "@/components/chatbot-gate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +37,7 @@ export default function RootLayout({
         <StockProvider>
           <CryptoProvider>
             {children}
-            <ChatBot />
+            <ChatBotGate />
           </CryptoProvider>
         </StockProvider>
         </AuthProvider>

@@ -26,13 +26,13 @@ export function DashboardChartTooltip({
   const title = label || payload[0]?.payload?.name || payload[0]?.name;
 
   return (
-    <div className="min-w-[132px] rounded-xl border border-white/10 bg-[#101c18] px-3 py-2.5 text-[#f2f6ef] shadow-[0_16px_40px_rgba(0,0,0,.45)]">
+    <div className="min-w-[132px] rounded-xl border border-blue-200/15 bg-[#111a33] px-3 py-2.5 text-[#f4f7ff] shadow-[0_16px_40px_rgba(0,0,0,.45)]">
       {title ? <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/50">{title}</p> : null}
       <div className="space-y-1">
         {payload.map((item, index) => (
           <div key={`${String(item.dataKey || item.name)}-${index}`} className="flex items-center justify-between gap-4 text-xs">
             <span className="flex items-center gap-1.5 text-white/60">
-              <span className="size-1.5 rounded-full" style={{ background: item.color || item.fill || item.payload?.color || "#c8ff62" }} />
+              <span className="size-1.5 rounded-full" style={{ background: item.color || item.fill || item.payload?.color || "#60a5fa" }} />
               {label ? item.name : "Value"}
             </span>
             <span className="font-semibold text-white">{formatCurrency(Number(item.value || 0))}</span>
@@ -74,15 +74,15 @@ export function ReturnBadge({ value, suffix = "all time", className }: { value: 
 }
 
 export function SectionCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <section className={cn("rounded-[22px] border border-white/[0.075] bg-[#0d1814]/90 shadow-[0_18px_60px_rgba(0,0,0,0.16)]", className)}>{children}</section>;
+  return <section className={cn("rounded-[22px] border border-blue-200/[0.09] bg-[#0f172a]/90 shadow-[0_18px_60px_rgba(0,0,0,0.2)]", className)}>{children}</section>;
 }
 
 export function PageHeading({ eyebrow, title, description, actions }: { eyebrow: string; title: string; description: string; actions?: React.ReactNode }) {
   return (
     <div className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c8ff62]/75">
-          <span className="size-1.5 rounded-full bg-[#c8ff62] shadow-[0_0_12px_#c8ff62]" /> {eyebrow}
+        <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#60a5fa]/85">
+          <span className="size-1.5 rounded-full bg-[#60a5fa] shadow-[0_0_12px_#60a5fa]" /> {eyebrow}
         </div>
         <h1 className="text-3xl font-semibold tracking-[-0.045em] text-white sm:text-[38px] sm:leading-tight">{title}</h1>
         <p className="mt-2 max-w-xl text-sm leading-6 text-white/40">{description}</p>
@@ -94,7 +94,7 @@ export function PageHeading({ eyebrow, title, description, actions }: { eyebrow:
 
 export function RefreshButton({ onClick, loading }: { onClick: () => void; loading: boolean }) {
   return (
-    <button onClick={onClick} disabled={loading} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#c8ff62] px-4 text-xs font-semibold text-[#07100d] transition hover:bg-[#d6ff89] disabled:cursor-not-allowed disabled:opacity-60">
+    <button onClick={onClick} disabled={loading} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#3b82f6] px-4 text-xs font-semibold text-white transition hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-60">
       <svg className={cn("size-3.5", loading && "animate-spin")} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8"/><path d="M20 3v5h-5"/></svg>
       {loading ? "Syncing" : "Refresh data"}
     </button>

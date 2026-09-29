@@ -20,7 +20,7 @@ export const StockProvider = ({ children }) => {
     const response = await axios.get(
       `https://wealthone.onrender.com/api/v1/stock?name=${symbol}`
     );
-    const nsePrice = parseFloat(response.data.currentPrice.NSE);
+    const nsePrice = parseFloat(response.data?.currentPrice?.NSE);
     
     if (isNaN(nsePrice)) {
       throw new Error(`Invalid price data for ${symbol}`);
@@ -64,7 +64,7 @@ export const StockProvider = ({ children }) => {
         const price = await fetchSingleStockPrice(stock.symbol);
         updatedPrices[stock.symbol] = price;
       } catch (error) {
-        console.error(`Failed to fetch CMP for ${stock.symbol}`, error);
+        console.warn(`Live CMP unavailable for ${stock.symbol}`, error);
         errors.push(`Failed to fetch ${stock.symbol}`);
       }
     }

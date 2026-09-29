@@ -16,8 +16,7 @@ export default function StocksPage() {
       lastUpdated={lastUpdated}
       onRefresh={fetchAllCmpPrices}
       accent="#a78bfa"
-      secondary="#c8ff62"
+      secondary="#60a5fa"
     />
   );
 }
-

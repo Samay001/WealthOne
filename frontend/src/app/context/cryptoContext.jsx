@@ -107,7 +107,7 @@ export const CryptoProvider = ({ children }) => {
         console.log("Received API response:", response);
 
         if (!response.data || !response.data.data) {
-            console.error("API response is missing the 'data' field.", response.data);
+            console.warn("Crypto price response is missing the 'data' field.", response.data);
             setError("Received an invalid response from the API.");
             setIsLoading(false);
             return;
@@ -128,7 +128,7 @@ export const CryptoProvider = ({ children }) => {
         });
 
         if (Object.keys(formattedPrices).length === 0) {
-            console.error("Could not format any prices from the API response.", apiData);
+            console.warn("Could not format any prices from the API response.", apiData);
             setError("Could not extract any prices. Check if symbols in your data match the API.");
         } else {
             console.log("Successfully formatted prices:", formattedPrices);
@@ -139,7 +139,7 @@ export const CryptoProvider = ({ children }) => {
         }
 
     } catch (error) {
-        console.error("Failed to fetch CMP data:", error);
+        console.warn("Failed to fetch CMP data:", error);
         let errorMessage = "Failed to fetch market prices.";
         if (error.code === "ERR_NETWORK") {
             errorMessage += " This could be a CORS issue or the API server might be down. Check the browser console for details.";

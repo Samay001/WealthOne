@@ -56,7 +56,7 @@
 
 /* Keep every Recharts fallback tooltip readable on the dark dashboard. */
 .recharts-default-tooltip {
-  background: #101c18 !important;
+  background: #111a33 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 12px !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;

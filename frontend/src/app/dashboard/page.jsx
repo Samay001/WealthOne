@@ -8,7 +8,7 @@ import { useStock } from "../context/stockContext";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { DashboardChartTooltip, PageHeading, RefreshButton, ReturnBadge, SectionCard, formatCurrency } from "@/components/dashboard-ui";
 
-const allocationColors = ["#c8ff62", "#a78bfa"];
+const allocationColors = ["#60a5fa", "#a78bfa"];
 
 export default function DashboardPage() {
   const { isLoading: cryptoLoading, error: cryptoError, fetchCmpData, getCryptoData } = useCrypto();
@@ -37,12 +37,12 @@ export default function DashboardPage() {
       {(stockError || cryptoError) ? <div className="mb-5 rounded-2xl border border-[#ff8792]/20 bg-[#ff8792]/[0.06] px-4 py-3 text-xs text-[#ffacb4]">Some live prices could not be updated. Last available purchase values are shown where needed.</div> : null}
 
       <div className="grid gap-4 xl:grid-cols-[1.55fr_1fr]">
-        <section className="relative min-h-[310px] overflow-hidden rounded-[26px] border border-[#c8ff62]/15 bg-[#c8ff62] p-6 text-[#0a120f] sm:p-8">
-          <div className="absolute -right-24 -top-28 size-[340px] rounded-full border-[55px] border-[#0a120f]/[0.055]" />
-          <div className="absolute bottom-0 right-0 h-32 w-1/2 opacity-20 [background-image:linear-gradient(135deg,transparent_25%,#07100d_25%,#07100d_28%,transparent_28%,transparent_50%,#07100d_50%,#07100d_53%,transparent_53%,transparent_75%,#07100d_75%,#07100d_78%,transparent_78%)] [background-size:24px_24px]" />
+        <section className="relative min-h-[310px] overflow-hidden rounded-[26px] border border-[#60a5fa]/20 bg-gradient-to-br from-[#2563eb] via-[#3b82f6] to-[#6366f1] p-6 text-white shadow-[0_24px_80px_rgba(37,99,235,0.22)] sm:p-8">
+          <div className="absolute -right-24 -top-28 size-[340px] rounded-full border-[55px] border-white/[0.07]" />
+          <div className="absolute bottom-0 right-0 h-32 w-1/2 opacity-15 [background-image:linear-gradient(135deg,transparent_25%,#ffffff_25%,#ffffff_28%,transparent_28%,transparent_50%,#ffffff_50%,#ffffff_53%,transparent_53%,transparent_75%,#ffffff_75%,#ffffff_78%,transparent_78%)] [background-size:24px_24px]" />
           <div className="relative flex h-full flex-col justify-between">
-            <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0a120f]/55">Total portfolio value</p><p className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">{formatCurrency(current)}</p></div><div className="grid size-11 place-items-center rounded-2xl bg-[#0a120f] text-[#c8ff62]"><WalletCards className="size-5" /></div></div>
-            <div className="mt-16 flex flex-wrap items-end justify-between gap-5"><div><ReturnBadge value={returnPercent} suffix="total return" className="bg-[#0a120f] text-[#c8ff62]" /><p className="mt-3 text-sm text-[#0a120f]/55">{returns >= 0 ? "+" : "−"}{formatCurrency(Math.abs(returns))} on {formatCurrency(invested)} invested</p></div><div className="text-right"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#0a120f]/45">Assets tracked</p><p className="mt-1 text-2xl font-semibold">{holdings.length}</p></div></div>
+            <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/65">Total portfolio value</p><p className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">{formatCurrency(current)}</p></div><div className="grid size-11 place-items-center rounded-2xl bg-[#00031c]/80 text-[#93c5fd]"><WalletCards className="size-5" /></div></div>
+            <div className="mt-16 flex flex-wrap items-end justify-between gap-5"><div><ReturnBadge value={returnPercent} suffix="total return" className="bg-[#00031c]/80 text-[#bfdbfe]" /><p className="mt-3 text-sm text-white/65">{returns >= 0 ? "+" : "−"}{formatCurrency(Math.abs(returns))} on {formatCurrency(invested)} invested</p></div><div className="text-right"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/55">Assets tracked</p><p className="mt-1 text-2xl font-semibold">{holdings.length}</p></div></div>
           </div>
         </section>
 
@@ -67,7 +67,7 @@ export default function DashboardPage() {
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         <SectionCard className="p-5"><ShieldCheck className="size-5 text-[#72efb1]" /><p className="mt-5 text-sm font-semibold text-white">Diversification check</p><p className="mt-2 text-xs leading-5 text-white/38">{largestHolding ? `${largestHolding.symbol.replace("INR", "")} is your largest tracked position. Review concentration as values move.` : "Add holdings to evaluate concentration."}</p></SectionCard>
         <SectionCard className="p-5"><Clock3 className="size-5 text-[#b9a4ff]" /><p className="mt-5 text-sm font-semibold text-white">Market data</p><p className="mt-2 text-xs leading-5 text-white/38">{lastUpdated ? `Equity prices synced ${new Date(lastUpdated).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}.` : "Live pricing syncs when the dashboard opens."}</p></SectionCard>
-        <SectionCard className="border-[#c8ff62]/15 bg-[#c8ff62]/[0.055] p-5"><Sparkles className="size-5 text-[#c8ff62]" /><p className="mt-5 text-sm font-semibold text-white">AI wealth assistant</p><p className="mt-2 text-xs leading-5 text-white/38">Use the assistant to explore allocation, portfolio risk, and individual positions.</p></SectionCard>
+        <SectionCard className="border-[#60a5fa]/20 bg-[#3b82f6]/[0.08] p-5"><Sparkles className="size-5 text-[#60a5fa]" /><p className="mt-5 text-sm font-semibold text-white">AI wealth assistant</p><p className="mt-2 text-xs leading-5 text-white/38">Use the assistant to explore allocation, portfolio risk, and individual positions.</p></SectionCard>
       </div>
     </DashboardShell>
   );

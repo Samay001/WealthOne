@@ -133,8 +133,11 @@ export default function ChatBot() {
         content: data.text,
         sources: data.sources,
       }]);
-    } catch {
-      setMessages((current) => [...current, { id: `${Date.now()}-error`, role: "assistant", content: "I couldn’t complete that request. Please try again in a moment." }]);
+    } catch (error) {
+      const message = error instanceof Error && error.message.includes("OPENAI_API_KEY")
+        ? "The AI advisor is temporarily unavailable because its server key has not been configured."
+        : "I couldn’t complete that request. Please try again in a moment.";
+      setMessages((current) => [...current, { id: `${Date.now()}-error`, role: "assistant", content: message }]);
     } finally {
       setIsLoading(false);
     }
@@ -148,11 +151,11 @@ export default function ChatBot() {
   return (
     <div className="fixed bottom-4 right-4 z-[100] sm:bottom-6 sm:right-6">
       {isOpen ? (
-        <section className="flex h-[min(680px,calc(100vh-2rem))] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[26px] border border-white/10 bg-[#0b1512]/95 text-white shadow-[0_28px_90px_rgba(0,0,0,.48)] backdrop-blur-2xl sm:h-[600px] sm:w-[400px]" aria-label="WealthOne AI assistant">
+        <section className="flex h-[min(680px,calc(100vh-2rem))] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[26px] border border-blue-200/15 bg-[#070b22]/95 text-white shadow-[0_28px_90px_rgba(0,0,0,.48)] backdrop-blur-2xl sm:h-[600px] sm:w-[400px]" aria-label="WealthOne AI assistant">
           <header className="border-b border-white/[0.07] px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="relative grid size-10 place-items-center rounded-2xl bg-[#c8ff62] text-[#07100d]"><Sparkles className="size-4" /><span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-[#0b1512] bg-[#6ee7a8]" /></div>
-              <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h2 className="text-sm font-semibold">WealthOne AI</h2><span className="rounded-full bg-[#c8ff62]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#c8ff62]">GPT-4.1</span></div><p className="mt-0.5 text-[11px] text-white/35">Portfolio intelligence, on demand</p></div>
+              <div className="relative grid size-10 place-items-center rounded-2xl bg-[#60a5fa] text-[#00031c]"><Sparkles className="size-4" /><span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-[#070b22] bg-[#818cf8]" /></div>
+              <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h2 className="text-sm font-semibold">WealthOne AI</h2><span className="rounded-full bg-[#60a5fa]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#60a5fa]">GPT-4.1</span></div><p className="mt-0.5 text-[11px] text-white/35">Portfolio intelligence, on demand</p></div>
               <button onClick={() => setIsOpen(false)} className="grid size-8 place-items-center rounded-xl text-white/35 transition hover:bg-white/[0.06] hover:text-white" aria-label="Close assistant"><ChevronDown className="size-4" /></button>
             </div>
           </header>
@@ -161,32 +164,32 @@ export default function ChatBot() {
             <div className="space-y-5">
               {messages.map((message) => (
                 <div key={message.id} className={`flex items-end gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  {message.role === "assistant" ? <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#c8ff62]/10 text-[#c8ff62]"><Bot className="size-3.5" /></div> : null}
-                  <div className={`max-w-[82%] rounded-2xl px-3.5 py-3 text-[13px] leading-6 ${message.role === "user" ? "rounded-br-md bg-[#c8ff62] text-[#07100d]" : "rounded-bl-md border border-white/[0.07] bg-white/[0.045] text-white/72"}`}>
+                  {message.role === "assistant" ? <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#60a5fa]/10 text-[#60a5fa]"><Bot className="size-3.5" /></div> : null}
+                  <div className={`max-w-[82%] rounded-2xl px-3.5 py-3 text-[13px] leading-6 ${message.role === "user" ? "rounded-br-md bg-[#60a5fa] text-[#00031c]" : "rounded-bl-md border border-white/[0.07] bg-white/[0.045] text-white/72"}`}>
                     <ReactMarkdown components={{ p: ({ children }) => <p>{children}</p>, strong: ({ children }) => <strong className="font-semibold text-inherit">{children}</strong>, ul: ({ children }) => <ul className="mt-2 list-disc space-y-1 pl-4">{children}</ul>, a: ({ children, href }) => <a href={href} target="_blank" rel="noreferrer" className="underline underline-offset-2">{children}</a> }}>{message.content}</ReactMarkdown>
-                    {message.sources?.length ? <div className="mt-3 border-t border-white/[0.07] pt-2"><p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-white/30">Live sources</p><div className="flex flex-wrap gap-1.5">{message.sources.map((source, index) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer" className="max-w-full truncate rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] text-[#c8ff62] transition hover:bg-white/[0.1]" title={source.title}>{index + 1}. {source.title}</a>)}</div></div> : null}
+                    {message.sources?.length ? <div className="mt-3 border-t border-white/[0.07] pt-2"><p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-white/30">Live sources</p><div className="flex flex-wrap gap-1.5">{message.sources.map((source, index) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer" className="max-w-full truncate rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] text-[#60a5fa] transition hover:bg-white/[0.1]" title={source.title}>{index + 1}. {source.title}</a>)}</div></div> : null}
                   </div>
                   {message.role === "user" ? <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#a78bfa]/15 text-[#b9a4ff]"><User className="size-3.5" /></div> : null}
                 </div>
               ))}
-              {isLoading ? <div className="flex items-end gap-2"><div className="grid size-7 place-items-center rounded-xl bg-[#c8ff62]/10 text-[#c8ff62]"><Bot className="size-3.5" /></div><div className="flex gap-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-4 py-4"><span className="size-1.5 animate-bounce rounded-full bg-white/35 [animation-delay:-.3s]" /><span className="size-1.5 animate-bounce rounded-full bg-white/35 [animation-delay:-.15s]" /><span className="size-1.5 animate-bounce rounded-full bg-white/35" /></div></div> : null}
+              {isLoading ? <div className="flex items-end gap-2"><div className="grid size-7 place-items-center rounded-xl bg-[#60a5fa]/10 text-[#60a5fa]"><Bot className="size-3.5" /></div><div className="flex gap-1 rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.045] px-4 py-4"><span className="size-1.5 animate-bounce rounded-full bg-white/35 [animation-delay:-.3s]" /><span className="size-1.5 animate-bounce rounded-full bg-white/35 [animation-delay:-.15s]" /><span className="size-1.5 animate-bounce rounded-full bg-white/35" /></div></div> : null}
               <div ref={endRef} />
             </div>
           </div>
 
-          {messages.length === 1 ? <div className="flex gap-2 overflow-x-auto px-4 pb-3">{starters.map((starter) => <button key={starter} onClick={() => void sendMessage(starter)} className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1.5 text-[10px] text-white/45 transition hover:border-[#c8ff62]/30 hover:text-[#c8ff62]">{starter}</button>)}</div> : null}
+          {messages.length === 1 ? <div className="flex gap-2 overflow-x-auto px-4 pb-3">{starters.map((starter) => <button key={starter} onClick={() => void sendMessage(starter)} className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1.5 text-[10px] text-white/45 transition hover:border-[#60a5fa]/35 hover:text-[#60a5fa]">{starter}</button>)}</div> : null}
 
           <form onSubmit={onSubmit} className="border-t border-white/[0.07] p-3">
-            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.09] bg-black/20 p-1.5 pl-3 focus-within:border-[#c8ff62]/35">
+            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.09] bg-black/20 p-1.5 pl-3 focus-within:border-[#60a5fa]/40">
               <input value={input} onChange={(event) => setInput(event.target.value)} disabled={isLoading} placeholder="Ask about your portfolio…" className="h-9 min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/25" aria-label="Message the portfolio advisor" />
-              <button type="submit" disabled={!input.trim() || isLoading} className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#c8ff62] text-[#07100d] transition hover:bg-[#d8ff91] disabled:cursor-not-allowed disabled:opacity-30" aria-label="Send message"><Send className="size-4" /></button>
+              <button type="submit" disabled={!input.trim() || isLoading} className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] text-white transition hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-30" aria-label="Send message"><Send className="size-4" /></button>
             </div>
             <p className="mt-2 text-center text-[9px] text-white/20">AI guidance is educational, not financial advice.</p>
           </form>
         </section>
       ) : (
-        <button onClick={() => setIsOpen(true)} className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0d1814]/95 p-2 pr-4 text-white shadow-[0_18px_60px_rgba(0,0,0,.4)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[#c8ff62]/30" aria-label="Open WealthOne AI assistant">
-          <span className="relative grid size-11 place-items-center rounded-xl bg-[#c8ff62] text-[#07100d]"><MessageCircle className="size-5" /><span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-[#0d1814] bg-[#72efb1]" /></span>
+        <button onClick={() => setIsOpen(true)} className="group flex items-center gap-3 rounded-2xl border border-blue-200/15 bg-[#0f172a]/95 p-2 pr-4 text-white shadow-[0_18px_60px_rgba(0,0,0,.4)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[#60a5fa]/35" aria-label="Open WealthOne AI assistant">
+          <span className="relative grid size-11 place-items-center rounded-xl bg-[#60a5fa] text-[#00031c]"><MessageCircle className="size-5" /><span className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-[#0f172a] bg-[#818cf8]" /></span>
           <span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Ask WealthOne</span><span className="mt-0.5 block text-[10px] text-white/35">AI portfolio advisor</span></span>
           <X className="hidden" />
         </button>
